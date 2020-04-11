@@ -31,6 +31,7 @@ dex: 6
 levelup_stat_frequency: 4
 mutations:
   7:
+    MUT_COLD_BLOODED: 1
     MUT_POISON_RESISTANCE: 1
   14:
     MUT_STINGER: 1
