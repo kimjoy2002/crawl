@@ -376,6 +376,29 @@ struct shop_struct
     bool defined() const { return type != SHOP_UNASSIGNED; }
 };
 
+struct inn_struct
+{
+    coord_def           pos;
+    uint8_t             greed;
+    inn_type            type;
+    uint8_t             level;
+    string              inn_name;
+    string              inn_type_name;
+    string              inn_suffix_name;
+
+    FixedVector<uint8_t, 3> keeper_name;
+
+    vector<monster> mercenary;
+#if TAG_MAJOR_VERSION == 34
+    uint8_t num; // used in a save compat hack
+#endif
+
+    shop_struct () : pos(), greed(0), type(SHOP_UNASSIGNED), level(0),
+                     inn_name(""), inn_type_name(""), inn_suffix_name("") { }
+
+    bool defined() const { return type != INN_UNASSIGNED; }
+};
+
 /// Exception indicating a bad level_id, level_range, or depth_range.
 struct bad_level_id : public runtime_error
 {

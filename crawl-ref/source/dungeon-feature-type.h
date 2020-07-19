@@ -288,6 +288,7 @@ enum dungeon_feature_type
     DNGN_TOXIC_BOG,
 #endif
     DNGN_TEMPORAL_FLOOR,
+    DNGN_ENTER_INN,
 
     NUM_FEATURES
 };
