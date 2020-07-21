@@ -1891,6 +1891,9 @@ static spret _do_cast(spell_type spell, int powc, const dist& spd,
     case SPELL_SUMMON_MANA_VIPER:
         return cast_summon_mana_viper(powc, god, fail);
 
+    case SPELL_SUMMON_DREAM_HERD:
+        return cast_summon_dream_herd(powc, god, fail);
+
     case SPELL_CONJURE_BALL_LIGHTNING:
         return cast_conjure_ball_lightning(powc, god, fail);
 

@@ -4337,6 +4337,16 @@ static const struct spell_desc spelldata[] =
     TILEG_FLAME_STRIKE,
 },
 {
+    SPELL_SUMMON_DREAM_HERD, "Summon Dream Herd",
+    spschool::summoning | spschool::hexes,
+    spflag::mons_abjure,
+    6,
+    100,
+    -1, -1,
+    6, 0,
+    TILEG_ERROR,
+},
+{
     SPELL_NO_SPELL, "nonexistent spell",
     spschool::none,
     spflag::testing,

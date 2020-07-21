@@ -39,6 +39,7 @@ spret cast_summon_dragon(actor *caster, int pow,
 spret cast_summon_hydra(actor *caster, int pow, god_type god = GOD_NO_GOD,
                              bool fail = false);
 spret cast_summon_mana_viper(int pow, god_type god, bool fail);
+spret cast_summon_dream_herd(int pow, god_type god, bool fail);
 bool summon_berserker(int pow, actor *caster,
                       monster_type override_mons = MONS_PROGRAM_BUG);
 bool summon_holy_warrior(int pow, bool punish);

@@ -779,6 +779,36 @@ spret cast_summon_mana_viper(int pow, god_type god, bool fail)
     return spret::success;
 }
 
+spret cast_summon_dream_herd(int pow, god_type god, bool fail)
+{
+    if (otr_stop_summoning_prompt())
+        return spret::abort;
+
+    fail_check();
+    bool success = false;
+    int num = 0;
+    const int how_many = min(8, 3 + random2(3) + random2(pow) / 10);
+
+    for (int i = 0; i < how_many; ++i)
+    {
+        mgen_data sheep = _pal_data(MONS_DREAM_SHEEP, 4, god,
+                                     SPELL_SUMMON_DREAM_HERD);
+        sheep.hd = (5 + div_rand_round(pow, 12));
+        if (create_monster(sheep))
+        {
+            success = true;
+            ++num;
+        }
+    }
+
+    if (!success)
+        canned_msg(MSG_NOTHING_HAPPENS);
+    else
+        mprf("%s over the fence from dream into the world.", num == 1? "A dream sheep" : "Dream sheeps");
+
+    return spret::success;
+}
+
 // This assumes that the specified monster can go berserk.
 static void _make_mons_berserk_summon(monster* mon)
 {
@@ -3470,6 +3500,7 @@ static const map<spell_type, summon_cap> summonsdata =
     { SPELL_SUMMON_ICE_BEAST,           { 3, 3 } },
     { SPELL_SUMMON_HYDRA,               { 3, 2 } },
     { SPELL_SUMMON_MANA_VIPER,          { 2, 2 } },
+    { SPELL_SUMMON_DREAM_HERD,          { 8, 3 } },
     // Demons
     { SPELL_CALL_IMP,                   { 3, 3 } },
     { SPELL_SUMMON_DEMON,               { 3, 2 } },
