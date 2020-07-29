@@ -75,7 +75,7 @@ struct crawl_environment
 
     map<coord_def, shop_struct> shop; // shop list
     map<coord_def, trap_def> trap; // trap list
-    map<coord_def, inn_def> inn; // inn list
+    map<coord_def, inn_struct> inn; // inn list
 
     FixedVector< monster_type, MAX_MONS_ALLOC > mons_alloc;
     map_markers                              markers;

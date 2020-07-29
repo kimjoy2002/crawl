@@ -20,7 +20,7 @@ struct coord_def;
 struct level_pos;
 class  level_id;
 class  dlua_chunk;
-class monster;
+class  monster;
 
 #include "tags.h"
 

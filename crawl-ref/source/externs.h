@@ -388,12 +388,12 @@ struct inn_struct
 
     FixedVector<uint8_t, 3> keeper_name;
 
-    vector<monster> mercenary;
+//    vector<monster> mercenary;
 #if TAG_MAJOR_VERSION == 34
     uint8_t num; // used in a save compat hack
 #endif
 
-    shop_struct () : pos(), greed(0), type(SHOP_UNASSIGNED), level(0),
+    inn_struct () : pos(), greed(0), type(INN_UNASSIGNED), level(0),
                      inn_name(""), inn_type_name(""), inn_suffix_name("") { }
 
     bool defined() const { return type != INN_UNASSIGNED; }
