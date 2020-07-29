@@ -33,6 +33,7 @@
 #include "god-abil.h"
 #include "god-conduct.h"
 #include "god-item.h"
+#include "god-passive.h"
 #include "item-name.h"
 #include "item-prop.h"
 #include "item-status-flag-type.h"
@@ -1647,6 +1648,8 @@ static int _get_monster_armour_value(const monster *mon,
               + get_armour_res_cold(item, true)
               + get_armour_res_elec(item, true)
               + get_armour_res_corr(item);
+
+
 
     // Give a simple bonus, no matter the size of the MR bonus.
     if (get_armour_res_magic(item, true) > 0)
@@ -3326,6 +3329,13 @@ int monster::base_armour_class() const
         }
     }
 
+    if (type == MONS_PAVISE) {
+        int item_ = inv[MSLOT_SHIELD];
+        if (item_ != NON_ITEM) {
+            item_def& shield = mitm[item_];
+            return base_ac + shield.plus;
+        }
+    }
 
     // demonspawn & draconians combine base & class ac values.
     if (mons_is_job(type))
@@ -3774,6 +3784,11 @@ int monster::res_fire() const
 
     if (has_ench(ENCH_RESISTANCE))
         u++;
+	
+	if (have_passive(passive_t::share_resistance)
+		&& is_divine_companion()){
+		u = max(u, player_res_fire());
+	}
 
     if (u < -3)
         u = -3;
@@ -3825,6 +3840,11 @@ int monster::res_cold() const
 
     if (has_ench(ENCH_RESISTANCE))
         u++;
+	
+	if (have_passive(passive_t::share_resistance)
+		&& is_divine_companion()){
+		u = max(u, player_res_cold());
+	}
 
     if (u < -3)
         u = -3;
@@ -3865,6 +3885,11 @@ int monster::res_elec() const
 
     if (has_ench(ENCH_RESISTANCE))
         u++;
+
+	if (have_passive(passive_t::share_resistance)
+		&& is_divine_companion()){
+		u = max(u, player_res_electricity());
+	}
 
     // Monsters can legitimately get multiple levels of electricity resistance.
 
@@ -3925,6 +3950,11 @@ int monster::res_poison(bool temp) const
 
     if (has_ench(ENCH_RESISTANCE))
         u++;
+
+	if (have_passive(passive_t::share_resistance)
+		&& is_divine_companion()){
+		u = max(u, player_res_poison());
+	}
 
     // Monsters can have multiple innate levels of poison resistance, but
     // like players, equipment doesn't stack.
@@ -4026,6 +4056,11 @@ int monster::res_negative_energy(bool intrinsic_only) const
             u++;
     }
 
+	if (have_passive(passive_t::share_resistance)
+		&& is_divine_companion()){
+		u = max(u, player_prot_life());
+	}
+
     if (u > 3)
         u = 3;
 
@@ -4078,6 +4113,11 @@ int monster::res_acid(bool calc_unid) const
 
     if (has_ench(ENCH_RESISTANCE))
         u++;
+	
+	if (have_passive(passive_t::share_resistance)
+		&& is_divine_companion()){
+		u = max(u, player_res_acid());
+	}
 
     return u;
 }
@@ -4464,6 +4504,8 @@ int monster::hurt(const actor *agent, int amount, beam_type flavour,
                 amount /= 2;
             else if (petrifying())
                 amount = amount * 2 / 3;
+            else if (this->has_ench(ENCH_DEATHS_DOOR))
+               return (0);
         }
 
         if (amount != INSTANT_DEATH && has_ench(ENCH_INJURY_BOND))
@@ -6705,6 +6747,8 @@ int monster::spell_hd(spell_type spell) const
         hd *= 2;
     if (has_ench(ENCH_EMPOWERED_SPELLS))
         hd += 5;
+    if (has_ench(ENCH_CITRINITAS))
+        hd += max(2, you.piety/40);
     return hd;
 }
 

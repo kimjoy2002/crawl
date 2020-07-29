@@ -2224,6 +2224,8 @@ static int _player_evasion_size_factor(bool base = false)
 {
     // XXX: you.body_size() implementations are incomplete, fix.
     const size_type size = you.body_size(PSIZE_BODY, base);
+    if (you.species == SP_CRUSTACEAN)
+        return 2 * (SIZE_MEDIUM - size) - 2 * min(2, you.deaths/6);
     return 2 * (SIZE_MEDIUM - size);
 }
 
@@ -2773,8 +2775,7 @@ static void _handle_head_loss(int exp)
     if (!(you.attribute[ATTR_HEAD_LOSS_XP] > 0))
         return;
 
-    int loss = div_rand_round(exp * abs(you.props[HYDRA_HEADS_NET_LOSS].get_int())/12,
-                                max(1, calc_skill_cost(you.skill_cost_level) - 3));
+    int loss = exp * abs(you.props[HYDRA_HEADS_NET_LOSS].get_int())/2;
     you.attribute[ATTR_HEAD_LOSS_XP] -= loss;
     dprf("Head loss points: %d", you.attribute[ATTR_HEAD_LOSS_XP]);
     if (you.attribute[ATTR_HEAD_LOSS_XP] <= 0)
@@ -2873,7 +2874,7 @@ void gain_exp(unsigned int exp_gained, unsigned int* actual_gain)
     _recharge_xp_evokers(skill_xp);
     _reduce_abyss_xp_timer(skill_xp);
     _handle_xp_drain(skill_xp);
-    if (you.form != transformation::lich) // There is nothing to do if hydra is in a lich form.
+    if (you.form != transformation::lich && you.props[HYDRA_HEADS_NET_LOSS].get_int() != 0) // There is nothing to do if hydra is in a lich form.
         _handle_head_loss(skill_xp);
 
     if (player_under_penance(GOD_HEPLIAKLQANA))
@@ -7016,7 +7017,7 @@ bool player::tengu_flight() const
     return species == SP_TENGU && airborne();
 }
 
-void _head_loss_xp(int old_num, int delta) 
+void _head_loss_xp() 
 {
     int num = you.props[HYDRA_HEADS_NET_LOSS].get_int();
 
@@ -7040,8 +7041,6 @@ void _head_loss_xp(int old_num, int delta)
  */
 bool player::head_grow(int num, bool heal) const
 {
-    int old_num = you.props[HYDRA_HEADS_NET_LOSS].get_int();
-
     if (you.form == transformation::none && num != 0 && num < 27)
     {
         num = min(num, 27 - you.heads());
@@ -7055,20 +7054,22 @@ bool player::head_grow(int num, bool heal) const
                 if (you.heads() >= 27)
                     break;
                 you.props[HYDRA_HEADS_NET_LOSS].get_int()--;
-                _head_loss_xp(old_num, 1);
+                _head_loss_xp();
+
+                if (heal)
+                    you.heal(random2(1));
             }
-            if (heal)
-                you.heal(4*num + random2(4*num));
+            
         }
         else if (num < 0)
         {
             for (int i = 0; i < abs(num); i++)
             {    
                 you.props[HYDRA_HEADS_NET_LOSS].get_int()++;
-                _head_loss_xp(old_num, -1);
+                _head_loss_xp();
+                if (heal)
+                    ouch(4 + random2(4), KILLED_BY_DRAINING);
             }
-            if (heal)
-                ouch(abs(4*num + random2(4*num)), KILLED_BY_DRAINING);
         }
     }
     else if (you.form == transformation::lich && num < 0)
@@ -7077,10 +7078,10 @@ bool player::head_grow(int num, bool heal) const
         for (int i = 0; i < abs(num); i++)
         {
                 you.props[HYDRA_HEADS_NET_LOSS].get_int()++;
-                _head_loss_xp(old_num, -1);
+                _head_loss_xp();
+                if (heal)
+                    ouch(4 + random2(4), KILLED_BY_DRAINING);
         }
-        if (heal)
-            ouch(abs(4*num + random2(4*num)), KILLED_BY_DRAINING);
     }
     else if (num == 0 && heal)
     {
@@ -7088,7 +7089,7 @@ bool player::head_grow(int num, bool heal) const
         {
             mprf(MSGCH_INTRINSIC_GAIN, "One of your temporary head be permanent.");
             you.props[HYDRA_HEADS_NET_LOSS].get_int()++; // A temporary head will be your real head.
-            _head_loss_xp(old_num, -1);
+            _head_loss_xp();
         }
         else
         {
@@ -7266,8 +7267,8 @@ bool player::crustacean_rot(actor */*who*/, int amount, bool quiet, bool /*no_cl
     {
         return false;
     }
-    int d = random2(amount/3) + amount/6;
-    if (one_chance_in(2 + you.experience_level/9) && d > 0)
+    int d = random2(amount/6) + amount/3;
+    if (one_chance_in(1 + you.experience_level/9) && d > 0)
     {
         if (coinflip())
         {

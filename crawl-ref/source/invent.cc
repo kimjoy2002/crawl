@@ -526,6 +526,8 @@ string no_selectables_message(int item_selector)
         return "You aren't wearing any uncursed rings.";
     case OSEL_UNCURSED_WORN_AMULETS:
         return "You aren't wearing any uncursed amulets.";
+    case OSEL_WYRM_ESSENCES:
+        return "You aren't carrying any essences of alchemy.";
     case OSEL_BAG:
         return "You aren't carrying any items to put in bag.";
     }
@@ -1173,8 +1175,11 @@ bool item_is_selected(const item_def &i, int selector)
                && !is_artefact(i)
                && (!item_ident(i, ISFLAG_KNOW_PLUSES)
                    || i.plus < MAX_WPN_ENCHANT)) ||
-            (itype == OBJ_RODS && i.sub_type != ROD_PAKELLAS &&
-            item_is_rechargeable(i, true));
+                (itype == OBJ_RODS 
+                && i.sub_type != ROD_PAKELLAS 
+                && item_is_rechargeable(i, true) 
+                && (i.charge_cap < MAX_ROD_CHARGE * ROD_CHARGE_MULT
+                || i.rod_plus < MAX_WPN_ENCHANT));
 
     case OSEL_BLESSABLE_WEAPON:
         return is_brandable_weapon(i, you_worship(GOD_SHINING_ONE), true);
@@ -1198,6 +1203,12 @@ bool item_is_selected(const item_def &i, int selector)
     case OSEL_BAG:
         return !item_is_equipped(i) && (itype != OBJ_FOOD || i.sub_type != FOOD_CHUNK)
             && (itype != OBJ_MISCELLANY || i.sub_type != MISC_BAG);
+    case OSEL_WYRM_ESSENCES:
+        return (itype == OBJ_POTIONS
+                && (i.sub_type == POT_NIGREDO
+                    || i.sub_type == POT_ALBEDO
+                    || i.sub_type == POT_CITRINITAS
+                    || i.sub_type == POT_VIRIDITAS));
     case OBJ_POTIONS:
         return (itype == OBJ_MISCELLANY && i.sub_type == MISC_BAG); //in the bag
     default:

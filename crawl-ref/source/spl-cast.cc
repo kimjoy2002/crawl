@@ -505,7 +505,11 @@ int calc_spell_power(spell_type spell, bool apply_intel, bool fail_rate_check,
             // spell school levels).
             if (you.duration[DUR_BRILLIANCE])
                 power += 600;
-
+            
+            // The Great Wyrm: Empowered by piety when drink Citrinitas.
+            if (you.duration[DUR_CITRINITAS])
+                power += you.piety*4; //starts at +300(25%), max at +800(66%)
+            
             if (apply_intel)
                 power = (power * you.intel()) / 10;
 
@@ -1336,9 +1340,6 @@ static unique_ptr<targeter> _spell_targeter(spell_type spell, int pow,
         return make_unique<targeter_shotgun>(&you, CLOUD_CONE_BEAM_COUNT,
             range);
 
-    case SPELL_LEHUDIBS_CRYSTAL_SHOT:
-        return make_unique<targeter_shotgun>(&you, 5, range);
-
     default:
         break;
     }
@@ -1635,6 +1636,7 @@ spret your_spells(spell_type spell, int powc, bool allow_fail,
                           (you.experience_level / 2) + (spell_difficulty(spell) * 2),
                           random2avg(88, 3), "the malice of Kikubaaqudgha");
         }
+
         else if (vehumet_supports_spell(spell)
                  && !you_worship(GOD_VEHUMET)
                  && you.penance[GOD_VEHUMET]
@@ -1831,6 +1833,11 @@ static spret _do_cast(spell_type spell, int powc, const dist& spd,
     case SPELL_IGNITE_POISON:
         return cast_ignite_poison(&you, powc, fail);
 
+    // Not an 'damage' spell, just related ignite poison
+    // The Great Wyrm ability, no failure.
+    case SPELL_CONVERT_POISON:
+        return cast_convert_poison(&you, powc, fail);
+
     case SPELL_TORNADO:
         return cast_tornado(powc, fail);
 
@@ -1967,7 +1974,7 @@ static spret _do_cast(spell_type spell, int powc, const dist& spd,
     case SPELL_ENGLACIATION:
         return cast_englaciation(powc, fail);
 
-    case SPELL_CONTROL_UNDEAD:	
+    case SPELL_CONTROL_UNDEAD:
         return mass_enchantment(ENCH_CHARM, powc, fail);
 
     case SPELL_AURA_OF_ABJURATION:
@@ -2173,9 +2180,6 @@ static spret _do_cast(spell_type spell, int powc, const dist& spd,
     case SPELL_WILL_OF_EARTH:
         return cast_will_of_earth(target, powc, fail);
 
-    case SPELL_LEHUDIBS_CRYSTAL_SHOT:
-        return cast_lehudibs_crystal_shot(&you, powc, beam, fail);
-
     case SPELL_HAILSTORM:
         return cast_hailstorm(powc, fail);
 
@@ -2187,6 +2191,9 @@ static spret _do_cast(spell_type spell, int powc, const dist& spd,
 
     case SPELL_FLAME_STRIKE:
         return cast_flame_strike(powc, fail);
+
+    case SPELL_PAVISE:
+        return cast_pavise(powc, beam, fail);
 
     // non-player spells that have a zap, but that shouldn't be called (e.g
     // because they will crash as a player zap).

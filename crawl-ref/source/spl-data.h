@@ -1370,6 +1370,17 @@ static const struct spell_desc spelldata[] =
     TILEG_IGNITE_POISON,
 },
 
+    {
+        SPELL_CONVERT_POISON, "Viriditas",
+        spschool::poison | spschool::transmutation,
+        spflag::area,
+        4,
+        200,
+        -1, -1,
+        4, 0,
+        TILEG_IGNITE_POISON, // mimicing invocation
+    },
+
 {
     SPELL_STICKS_TO_SNAKES, "Sticks to Snakes",
     spschool::transmutation,
@@ -4244,7 +4255,7 @@ static const struct spell_desc spelldata[] =
 },
 
 {
-    SPELL_LEHUDIBS_CRYSTAL_SHOT, "Lehudib's Crystal Shot",
+    SPELL_LEHUDIBS_CRYSTAL_SHOT, "Lehudib's Crystal Spear",
     spschool::conjuration | spschool::earth,
     spflag::dir_or_target | spflag::needs_tracer,
     8,
@@ -4335,6 +4346,16 @@ static const struct spell_desc spelldata[] =
     -1, -1,
     4, 0,
     TILEG_FLAME_STRIKE,
+},
+{
+    SPELL_PAVISE, "Deploy Shield",
+    spschool::summoning,
+    spflag::target | spflag::not_self | spflag::neutral,
+    4,
+    200,
+    1, 1,
+    2, 0,
+    TILEG_SUMMON_BARRICADE,
 },
 {
     SPELL_NO_SPELL, "nonexistent spell",

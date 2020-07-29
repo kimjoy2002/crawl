@@ -1355,6 +1355,7 @@ bolt mons_spell_beam(const monster* mons, spell_type spell_cast, int power,
     case SPELL_FIREBALL:
     case SPELL_ICEBLAST:
     case SPELL_LEHUDIBS_CRYSTAL_SPEAR:
+    case SPELL_LEHUDIBS_CRYSTAL_SHOT:
     case SPELL_BOLT_OF_DRAINING:
     case SPELL_ISKENDERUNS_MYSTIC_BLAST:
     case SPELL_STICKY_FLAME:
@@ -1627,7 +1628,6 @@ bolt mons_spell_beam(const monster* mons, spell_type spell_cast, int power,
     case SPELL_GLACIATE:              // ditto
     case SPELL_CLOUD_CONE:            // ditto
     case SPELL_SCATTERSHOT:           // ditto
-    case SPELL_LEHUDIBS_CRYSTAL_SHOT:
     case SPELL_FOXFIRE:
         _setup_fake_beam(beam, *mons);
         break;
@@ -1872,6 +1872,7 @@ bool setup_mons_cast(const monster* mons, bolt &pbolt, spell_type spell_cast,
     case SPELL_SIMULACRUM:
 #endif
     case SPELL_CALL_IMP:
+    case SPELL_CALL_CANINE_FAMILIAR:
     case SPELL_SUMMON_MINOR_DEMON:
 #if TAG_MAJOR_VERSION == 34
     case SPELL_SUMMON_SCORPIONS:
@@ -1923,9 +1924,7 @@ bool setup_mons_cast(const monster* mons, bolt &pbolt, spell_type spell_cast,
     case SPELL_SUMMON_DRAGON:
     case SPELL_SUMMON_HYDRA:
     case SPELL_FIRE_SUMMON:
-#if TAG_MAJOR_VERSION == 34
     case SPELL_DEATHS_DOOR:
-#endif
     case SPELL_OZOCUBUS_ARMOUR:
     case SPELL_OLGREBS_TOXIC_RADIANCE:
     case SPELL_SHATTER:
@@ -3834,32 +3833,6 @@ bool scattershot_tracer(monster *caster, int pow, coord_def aim)
             continue;
 
         const actor *victim = actor_at(entry.first);
-        if (!victim)
-            continue;
-
-        if (mons_atts_aligned(castatt, victim->temp_attitude()))
-            friendly += victim->get_experience_level();
-        else
-            enemy += victim->get_experience_level();
-    }
-
-    return enemy > friendly;
-}
-
-static bool _lehudib_shot_tracer(monster* caster, int pow, coord_def aim)
-{
-    targeter_shotgun hitfunc(caster, 5, spell_range(SPELL_LEHUDIBS_CRYSTAL_SHOT, pow));
-    hitfunc.set_aim(aim);
-
-    mon_attitude_type castatt = caster->temp_attitude();
-    int friendly = 0, enemy = 0;
-
-    for (const auto& entry : hitfunc.zapped)
-    {
-        if (entry.second <= 0)
-            continue;
-
-        const actor* victim = actor_at(entry.first);
         if (!victim)
             continue;
 
@@ -6660,7 +6633,8 @@ void mons_cast(monster* mons, bolt pbolt, spell_type spell_cast,
         return;
     
     case SPELL_FOXFIRE:
-        cast_foxfire(mons, mons->spell_hd(spell_cast), &pbolt, god);
+        cast_foxfire(mons, mons->spell_hd(spell_cast), /*&pbolt,*/ god);
+        return;
 
     case SPELL_AWAKEN_FOREST:
         if (!mons->friendly() && have_passive(passive_t::friendly_plants))
@@ -6710,6 +6684,17 @@ void mons_cast(monster* mons, bolt pbolt, spell_type spell_cast,
                 .set_summoned(mons, duration, spell_cast, god));
         }
         return;
+
+    
+    case SPELL_DEATHS_DOOR:
+         if (!mons->has_ench(ENCH_DEATHS_DOOR))
+         {
+             const int dur = BASELINE_DELAY * 2 * mons->skill(SK_NECROMANCY);
+             mprf("%s stands defiantly in death's doorway!", mons->name(DESC_THE).c_str());
+             mons->hit_points = std::max(std::min(mons->hit_points, mons->skill(SK_NECROMANCY)), 1);
+             mons->add_ench(mon_enchant(ENCH_DEATHS_DOOR, 0, mons, dur));
+         }
+         return;
 
     case SPELL_REGENERATION:
     {
@@ -6762,6 +6747,30 @@ void mons_cast(monster* mons, bolt pbolt, spell_type spell_cast,
                 mi->add_ench(bond);
             }
         }
+
+        return;
+    }
+    
+    case SPELL_CALL_CANINE_FAMILIAR:
+    {
+        const int power = (mons->spell_hd(spell_cast) * 15)/10;
+
+        monster_type mon = MONS_PROGRAM_BUG;
+
+        const int chance = power * 2 + random_range(-10, 10);
+
+        if (chance > 59)
+            mon = MONS_WARG;
+        else if (chance > 39)
+            mon = MONS_WOLF;
+        else
+            mon = MONS_HOUND;
+
+        const int dur = min(2 + (random2(power) / 4), 6);
+
+        create_monster(mgen_data(mon, SAME_ATTITUDE(mons),
+                                 mons->pos(), mons->foe)
+                       .set_summoned(mons, dur, spell_cast, god));
 
         return;
     }
@@ -7023,13 +7032,6 @@ void mons_cast(monster* mons, bolt pbolt, spell_type spell_cast,
     {
         ASSERT(foe);
         cast_scattershot(mons, splpow, foe->pos());
-        return;
-    }
-
-    case SPELL_LEHUDIBS_CRYSTAL_SHOT:
-    {
-        ASSERT(foe);
-        cast_lehudibs_crystal_shot(mons, splpow, pbolt, false);
         return;
     }
 
@@ -8507,11 +8509,6 @@ static bool _ms_waste_of_time(monster* mon, mon_spell_slot slot)
                || !scattershot_tracer(mon, mons_spellpower(*mon, monspell),
                                       foe->pos());
 
-    case SPELL_LEHUDIBS_CRYSTAL_SHOT:
-        return !foe
-            || !_lehudib_shot_tracer(mon, mons_spellpower(*mon, monspell),
-                foe->pos());
-
     case SPELL_CLEANSING_FLAME:
     {
         bolt tracer;
@@ -8603,10 +8600,11 @@ static bool _ms_waste_of_time(monster* mon, mon_spell_slot slot)
     case SPELL_IGNITE_POISON_SINGLE:
     case SPELL_HUNTING_CRY:
     case SPELL_CONTROL_WINDS:
-    case SPELL_DEATHS_DOOR:
     case SPELL_FULMINANT_PRISM:
     case SPELL_CONTROL_UNDEAD:
 #endif
+    case SPELL_DEATHS_DOOR:
+        return mon->has_ench(ENCH_DEATHS_DOOR);
     case SPELL_NO_SPELL:
         return true;
 

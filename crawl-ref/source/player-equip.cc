@@ -23,6 +23,7 @@
 #include "item-use.h"
 #include "libutil.h"
 #include "macro.h" // command_to_string
+#include "monster.h"
 #include "message.h"
 #include "mutation.h"
 #include "nearby-danger.h"
@@ -34,7 +35,9 @@
 #include "spl-miscast.h"
 #include "spl-selfench.h"
 #include "spl-summoning.h"
+#include "spl-transloc.h"
 #include "spl-wpnench.h"
+#include "stringutil.h"
 #include "xom.h"
 
 static void _mark_unseen_monsters();
@@ -996,6 +999,8 @@ static void _equip_armour_effect(item_def& arm, bool unmeld,
             else
                 mpr("You feel immune to the effects of clouds.");
             break;
+        case SPARM_BUNKER:
+            break;
         }
     }
 
@@ -1162,6 +1167,8 @@ static void _unequip_armour_effect(item_def& item, bool meld,
     case SPARM_CLOUD_IMMUNE:
         if (!you.cloud_immune())
             mpr("You feel vulnerable to the effects of clouds.");
+        break;
+    case SPARM_BUNKER:
         break;
 
     default:

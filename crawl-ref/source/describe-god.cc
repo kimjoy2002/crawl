@@ -243,6 +243,10 @@ static const char *divine_title[][8] =
     // Wu Jian -- animal/chinese martial arts monk theme
     {"Wooden Rat",          "Young Dog",             "Young Crane",              "Young Tiger",
         "Young Dragon",     "Red Sash",               "Golden Sash",              "Sifu"},
+
+        // The Great Wyrm -- alchemy theme
+        {"Fangless",            "Hyle",                 "Solvent",            "Torus",
+            "Lapis",   	"@Walking@ Metaphor",    "@Walking@ Providence",    "Ouroboros"},
 };
 COMPILE_CHECK(ARRAYSZ(divine_title) == NUM_GODS);
 

@@ -235,6 +235,10 @@ int attack::calc_to_hit(bool random)
         if (you.get_mutation_level(MUT_EYEBALLS))
             mhit += 2 * you.get_mutation_level(MUT_EYEBALLS) + 1;
 
+        // The Great Wyrm
+        if (you.duration[DUR_CITRINITAS])
+            mhit += you.piety/40;
+
         // hit roll
         mhit = maybe_random2(mhit, random);
     }
@@ -292,6 +296,10 @@ int attack::calc_to_hit(bool random)
     // Don't delay doing this roll until test_hit().
     if (!attacker->is_player())
         mhit = random2(mhit + 1);
+
+    // The Great Wyrm can buff ally mob
+    if (!attacker->is_player() && attacker->as_monster()->has_ench(ENCH_CITRINITAS))
+        mhit += you.piety/40;
 
     dprf(DIAG_COMBAT, "%s: Base to-hit: %d, Final to-hit: %d",
          attacker->name(DESC_PLAIN).c_str(),
@@ -484,18 +492,14 @@ bool attack::distortion_affects_defender()
         BIG_DMG,
         BANISH,
         BLINK,
-        TELE_INSTANT,
-        TELE_DELAYED,
         NONE
     };
 
-    const disto_effect choice = random_choose_weighted(33, SMALL_DMG,
-                                                       22, BIG_DMG,
-                                                       5,  BANISH,
-                                                       15, BLINK,
-                                                       10, TELE_INSTANT,
-                                                       10, TELE_DELAYED,
-                                                       5,  NONE);
+    const disto_effect choice = random_choose_weighted(35, SMALL_DMG,
+                                                       25, BIG_DMG,
+                                                       10,  BANISH,
+                                                       20, BLINK,
+                                                       10,  NONE);
 
     if (simu && !(choice == SMALL_DMG || choice == BIG_DMG))
         return false;
@@ -528,23 +532,6 @@ bool attack::distortion_affects_defender()
         defender->banish(attacker, attacker->name(DESC_PLAIN, true),
                          attacker->get_experience_level());
         return true;
-    case TELE_INSTANT:
-    case TELE_DELAYED:
-        if (defender_visible)
-            obvious_effect = true;
-        if (crawl_state.game_is_sprint() && defender->is_player()
-            || defender->no_tele())
-        {
-            if (defender->is_player())
-                canned_msg(MSG_STRANGE_STASIS);
-            return false;
-        }
-
-        if (choice == TELE_INSTANT)
-            teleport_fineff::schedule(defender);
-        else
-            defender->teleport();
-        break;
     case NONE:
         // Do nothing
         break;

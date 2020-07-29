@@ -465,6 +465,8 @@ tileidx_t tileidx_feature_base(dungeon_feature_type feat)
         return TILE_DNGN_ALTAR_HEPLIAKLQANA;
     case DNGN_ALTAR_WU_JIAN:
         return TILE_DNGN_ALTAR_WU_JIAN;
+    case DNGN_ALTAR_WYRM:
+        return TILE_DNGN_ALTAR_WYRM;
     case DNGN_ALTAR_ECUMENICAL:
         return TILE_DNGN_ALTAR_ECUMENICAL;
     case DNGN_FOUNTAIN_BLUE:
@@ -3518,6 +3520,8 @@ tileidx_t tileidx_ability(const ability_type ability)
         return TILEG_ABILITY_EVOKE_RATSKIN;
     case ABIL_EVOKE_THUNDER:
         return TILEG_ABILITY_EVOKE_THUNDER;
+    case ABIL_EVOKE_PAVISE:
+        return TILEG_ABILITY_DEPLOY_SHIELD;
 
     // Divine abilities
     // Zin
@@ -3802,7 +3806,19 @@ tileidx_t tileidx_ability(const ability_type ability)
         return TILEG_ABILITY_WU_JIAN_SERPENTS_LASH;
     case ABIL_WU_JIAN_HEAVENLY_STORM:
         return TILEG_ABILITY_WU_JIAN_HEAVENLY_STORM;
-
+    // The Great Wyrm
+    case ABIL_WYRM_INFUSE:
+        return TILEG_ABILITY_WYRM_INFUSE;
+    case ABIL_WYRM_NIGREDO:
+        return TILEG_ABILITY_WYRM_NIGREDO;
+    case ABIL_WYRM_ALBEDO:
+        return TILEG_ABILITY_WYRM_ALBEDO;
+    case ABIL_WYRM_CITRINITAS:
+        return TILEG_ABILITY_WYRM_CITRINITAS;
+    case ABIL_WYRM_VIRIDITAS:
+        return TILEG_ABILITY_WYRM_VIRIDITAS;
+    case ABIL_WYRM_RUBEDO:
+        return TILEG_ABILITY_WYRM_RUBEDO;
     // General divine (pseudo) abilities.
     case ABIL_RENOUNCE_RELIGION:
         return TILEG_ABILITY_RENOUNCE_RELIGION;

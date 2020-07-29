@@ -86,7 +86,8 @@ enum ability_type
 #endif
     ABIL_EVOKE_RATSKIN,
     ABIL_EVOKE_THUNDER,
-    ABIL_MAX_EVOKE = ABIL_EVOKE_THUNDER,
+    ABIL_EVOKE_PAVISE,
+    ABIL_MAX_EVOKE = ABIL_EVOKE_PAVISE,
 
     // Divine abilities
     // Zin
@@ -286,6 +287,14 @@ enum ability_type
     ABIL_WU_JIAN_WHIRLWIND,
     ABIL_WU_JIAN_WALLJUMP,
 
+    // The Great Wyrm
+    ABIL_WYRM_INFUSE = 1290,
+    ABIL_WYRM_NIGREDO,
+    ABIL_WYRM_ALBEDO,
+    ABIL_WYRM_CITRINITAS,
+    ABIL_WYRM_VIRIDITAS,
+    ABIL_WYRM_RUBEDO,
+    
     // For both Yred and Beogh
     ABIL_STOP_RECALL = 1500,
 

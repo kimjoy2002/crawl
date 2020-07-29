@@ -30,6 +30,10 @@ spret cast_irradiate(int powc, actor* who, bool fail);
 bool ignite_poison_affects(const actor* act);
 spret cast_ignite_poison(actor *agent, int pow, bool fail,
                               bool tracer = false);
+// The Great Wyrm's Viriditas
+spret cast_convert_poison(actor *agent, int pow, bool fail,
+                              bool tracer = false);
+
 bool safe_discharge(coord_def where, vector<const actor *> &exclude);
 spret cast_discharge(int pow, const actor &agent, bool fail = false,
                           bool prompt = true);
@@ -54,7 +58,7 @@ void forest_damage(const actor *mon);
 vector<bolt> get_spray_rays(const actor *caster, coord_def aim, int range,
                             int max_rays, int max_spacing = 3);
 spret cast_dazzling_spray(int pow, coord_def aim, bool fail);
-
+bool toxic_can_affect(const actor* act);
 spret cast_toxic_radiance(actor *caster, int pow, bool fail = false,
                                bool mon_tracer = false);
 void toxic_radiance_effect(actor* agent, int mult, bool on_cast = false);

@@ -157,6 +157,16 @@ the Loreminder for magical power and the ability to cast spells beyond their
 magical training. The devout are rewarded with a supply of spellbooks taken
 directly from Sif Muna's legendary library.
 %%%%
+the Great Wyrm
+
+The Great Wyrm, also called as 'Wyrm-bites-itself', is an wise and elder
+deity of alchemy, the arts of distillations. The Great Wyrm will distillate
+beneficial effects from corpses from foes, as a form of potions. Followers
+can transmute their potions into unique essences, to infuse a target and
+cause various effects; leaving miasma on target's trail, stunning target
+when enchanted, empowering accuracy and spells of target, and diffusing
+other infusions which target has.
+%%%%
 the Shining One
 
 Followers of the Shining One are bound to the code of the honourable warrior,
@@ -402,6 +412,19 @@ the Loreminder to help cast any spell they've discovered, even if it's well
 beyond their current magical training. Over time, devout followers will receive
 spellbooks containing a vast range of spells.
 %%%%
+the Great Wyrm powers
+
+Followers of the Wyrm will receive beneficial potions, after a combat against
+magically enchanted foes. These potions have a same effects as foes were once
+had, extracted from corpses of foes. The Alcemist who travels for the wisdom,
+will learn about unique essences of alchemy. Each essences are drinkable, made
+by transmuting a potion or other essence, and cause useful effects when infused.
+Nigredo will leave miasma on target's trail. Albedo will stun target if it has
+any dispellable effects. Citrinitas will empower target's accuracy and spells.
+Viriditas will convert target's damage upon you into heal. Finally, the most
+adept of alchemy, infuse a target with Rubedo, to disffuse all effects of other
+essences already infused.
+%%%%
 the Shining One powers
 
 Followers of the Shining One are surrounded by a halo that reveals their
@@ -609,6 +632,13 @@ Those in Sif Muna's ill graces find the very forces of magic rebelling against
 them. They are confused and stupefied, their magical reserves drained, their
 enchantments unravelled. Casting spells, too, becomes unreliable – and even
 dangerous.
+%%%%
+the Great Wyrm wrath
+
+The Great Wyrm is wise deity, but also an elder deity with menacing fangs.
+The Wyrm-of-World will bites those who abandon their travel. They will be
+Extracted health or magic immediately, Slowed, Paralysed, and sometimes
+being forced to waste potions, not only to drink but also to evaporate.
 %%%%
 the Shining One wrath
 
