@@ -805,6 +805,57 @@ struct shop_spec
 };
 
 /**
+ * @class inn_spec
+ * @ingroup mapdef
+ * @brief Specify how to create a inn.
+ *
+ * This specification struct is used when converting a vault-specified inn from
+ * a string into something the builder can use to actually create and place a
+ * inn.
+**/
+struct inn_spec
+{
+    inn_type inn_type;  /**< One of the inn_type enum values. */
+
+    string name;        /**< If provided, this is apostrophised and used as the
+                          *  inn keeper's name, ie, Plog as a name becomes
+                          *  Plog's. */
+
+    string type;        /**< If provided, this is used as the inn type name */
+                        
+
+    string suffix;      /**< If provided, this is used as the inn suffix,
+                          *  ie, Pub, inn, etc. */
+
+    int greed;          /**< If provided, this value is used for price
+                          *  calculation. The higher the greed, the more
+                          *  inflation applied to prices. */
+
+    int num_mercs;      /**< Cap the number of items in a shop at this. */
+
+    item_list items;    /**< If provided, and `use_all` is false, items will be
+                          *  selected at random from the list and used to
+                          *  populate the shop. If `use_all` is true, the items
+                          *  contained will be placed precisely and in order. If
+                          *  the number of items contained is less than
+                          *  specified, random items according to the shop's
+                          *  type will be used to fill in the rest of the stock.
+                          *  */
+
+    bool use_all;       /**< True if all items in `items` should be used. */
+
+    bool gozag;         /**< True if this shop was created by Gozag's Call
+                         *   Merchant ability (and therefore should have better
+                         *   stock).
+                         *   */
+
+    inn_spec(inn_type inn, string n="", string t="",
+              string s="", int g=-1, int ni=-1, bool u=false, bool goz=false)
+        : inn_type(inn), name(n), type(t), suffix(s),
+          greed(g), num_mercs(ni), items(), use_all(u), gozag(goz) { }
+};
+
+/**
  * @class trap_spec
  * @ingroup mapdef
  * @brief Specify how to create a trap.

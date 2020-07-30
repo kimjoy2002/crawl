@@ -85,6 +85,7 @@ hash.o \
 hints.o \
 hiscores.o \
 initfile.o \
+inn-type.o \
 invent.o \
 item-use.o \
 item-name.o \
@@ -141,6 +142,7 @@ melee-attack.o \
 menu.o \
 message-stream.o \
 message.o \
+mercenary.o \
 misc.o \
 mon-abil.o \
 mon-act.o \
