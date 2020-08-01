@@ -734,6 +734,25 @@ void dec_penance(int val)
     dec_penance(you.religion, val);
 }
 
+void demigod_penance(god_type god, int val)
+{
+    int reputation = 0;
+    for (int i = 0; i < NUM_RUNE_TYPES; i++)
+        if (you.runes[i])
+            ++reputation; 
+    // Demigod will not be focused by gods.
+    if (reputation == 0)
+    {
+        return;
+    }
+
+    if (x_chance_in_y(reputation, 100))
+    {
+        const bool succ = divine_retribution(god);
+        ASSERT(succ);
+    }
+}
+
 // TODO: find out what this is duplicating & deduplicate it
 static bool _need_water_walking()
 {
@@ -4254,7 +4273,7 @@ void handle_god_time(int /*time_delta*/)
     if (you.species == SP_ANGEL) {
         _handle_angel_time();
     }
-    else if (you.speices == SP_DEMIGOD && one_chance_in(3))
+    else if (you.species == SP_DEMIGOD && one_chance_in(3))
         lose_piety(1);
     else if (you.attribute[ATTR_GOD_WRATH_COUNT] > 0)
     {

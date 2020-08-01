@@ -69,7 +69,7 @@ void mons_att_changed(monster* mon)
 
 void demigod_bend(monster* mons)
 {
-    ASSERT(you.speices == SP_DEMIGOD);
+    ASSERT(you.species == SP_DEMIGOD);
     const monster_type montype = mons->type;
     if (you.species != SP_DEMIGOD || crawl_state.game_is_arena())
         return;
@@ -113,12 +113,17 @@ void demigod_bend(monster* mons)
 
         if (max(sides, pacified_roll) < mon_hp)
         {
-            record_monster_defeat(&mons, KILL_PACIFIED);
+            record_monster_defeat(mons, KILL_PACIFIED);
             mons_pacify(*mons, ATT_NEUTRAL);
             mons->attitude = ATT_GOOD_NEUTRAL;
             mons->flags |= MF_NO_REWARD;
+            mons->god == GOD_NO_GOD;
             stop_running();
+            gain_piety(mon_hp, 10);
         }
+
+        if (mons->god != GOD_NO_GOD)
+            demigod_penance(mons->god, 0);
     }
 }
 static void _jiyva_convert_slime(monster* slime);

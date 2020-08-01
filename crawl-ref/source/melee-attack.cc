@@ -424,7 +424,6 @@ bool melee_attack::handle_phase_hit()
         {
             hit_woke_orc = true;
         }
-        // Charisma
     }
 
     damage_done = 0;
@@ -545,6 +544,9 @@ bool melee_attack::handle_phase_hit()
             // beaten-up conversion messages (if applicable).
             beogh_follower_convert(defender->as_monster(), true);
         }
+
+        if (attacker->is_player() && you.species == SP_DEMIGOD)
+            demigod_bend(defender->as_monster());
     }
     else if (needs_message)
     {
