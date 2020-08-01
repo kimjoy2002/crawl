@@ -2,6 +2,7 @@
 
 void mons_att_changed(monster* mons);
 
+void demigod_bend(monster* mons);
 void good_god_follower_attitude_change(monster* mons);
 void fedhas_neutralise(monster* mons);
 void beogh_follower_convert(monster* mons, bool orc_hit = false);

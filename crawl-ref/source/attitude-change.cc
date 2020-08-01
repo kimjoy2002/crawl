@@ -67,6 +67,60 @@ void mons_att_changed(monster* mon)
     mon->remove_summons(true);
 }
 
+void demigod_bend(monster* mons)
+{
+    ASSERT(you.speices == SP_DEMIGOD);
+    const monster_type montype = mons->type;
+    if (you.species != SP_DEMIGOD || crawl_state.game_is_arena())
+        return;
+
+    // Player ghost never be bended.
+    if (mons_is_pghost(montype))
+        return;
+
+    if (!mons->is_summoned()
+        && !testbits(mons->flags, MF_ATT_CHANGE_ATTEMPT)
+        && !mons->friendly()
+        && mons->alive())
+    {
+        mons->flags |= MF_ATT_CHANGE_ATTEMPT;
+
+        const int hd = mons->get_experience_level();
+
+        if (random2(you.piety / 15) + random2(4 + you.experience_level / 3)
+                 < random2(hd) + hd + random2(5))
+       {
+           return;
+       }
+
+    int powc = 30 + you.piety/10;
+
+    int heal_div = 3;
+    //
+    if (mons_class_holiness(montype) & MH_UNDEAD)
+        heal_div = 2;
+    if (mons_class_holiness(montype) & MH_HOLY)
+        heal_div = 5;
+    if (mons_class_holiness(montype) & MH_DEMONIC)
+        heal_div = 5;
+
+    //_pacification_sides
+    const int mon_hp = montype == MONS_PANDEMONIUM_LORD ? 1000 : mons_avg_hp(montype);
+    const int heal_mult = (mons_class_intel(montype) < I_HUMAN) ? 3 : 1;
+    // ignoring monster holiness & int
+    const int sides = heal_mult * powc * 2 / heal_div;
+    const int pacified_roll = biased_random2(sides - 1,2);
+
+        if (max(sides, pacified_roll) < mon_hp)
+        {
+            record_monster_defeat(&mons, KILL_PACIFIED);
+            mons_pacify(*mons, ATT_NEUTRAL);
+            mons->attitude = ATT_GOOD_NEUTRAL;
+            mons->flags |= MF_NO_REWARD;
+            stop_running();
+        }
+    }
+}
 static void _jiyva_convert_slime(monster* slime);
 static void _fedhas_neutralise_plant(monster* plant);
 static void _good_god_holy_fail_attitude_change(monster* holy);
@@ -111,8 +165,6 @@ void good_god_follower_attitude_change(monster* mons)
             _good_god_holy_fail_attitude_change(mons);
     }
 }
-
-
 
 void beogh_follower_convert(monster* mons, bool orc_hit)
 {

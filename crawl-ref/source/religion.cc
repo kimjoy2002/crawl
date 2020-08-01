@@ -4254,6 +4254,8 @@ void handle_god_time(int /*time_delta*/)
     if (you.species == SP_ANGEL) {
         _handle_angel_time();
     }
+    else if (you.speices == SP_DEMIGOD && one_chance_in(3))
+        lose_piety(1);
     else if (you.attribute[ATTR_GOD_WRATH_COUNT] > 0)
     {
         vector<god_type> angry_gods;

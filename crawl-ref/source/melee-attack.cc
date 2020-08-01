@@ -424,6 +424,7 @@ bool melee_attack::handle_phase_hit()
         {
             hit_woke_orc = true;
         }
+        // Charisma
     }
 
     damage_done = 0;

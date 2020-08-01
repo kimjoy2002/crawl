@@ -7210,6 +7210,10 @@ int player::hurt(const actor *agent, int amount, beam_type flavour,
         blood_spray(pos(), type, amount / 5);
     }
 
+    // You said you are great, but you also hurt, Huh?
+    if (you.species == SP_DEMIGOD)
+        lose_piety(amount/10 + random2(amount/10));
+
     return amount;
 }
 
