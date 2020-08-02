@@ -2747,6 +2747,7 @@ item_def* monster_die(monster& mons, killer_type killer,
         }
         destroy_tentacle(&mons);
     }
+
     else if (mons.type == MONS_ELDRITCH_TENTACLE_SEGMENT
              && killer != KILL_MISC)
     {
@@ -2774,6 +2775,9 @@ item_def* monster_die(monster& mons, killer_type killer,
                 killer,
                 mummy_curse_power(mons.type));
     }
+
+    // Demigod
+    demigod_gain_faith(&mons);
 
     // Necromancy
     if (!was_banished && !mons_reset)

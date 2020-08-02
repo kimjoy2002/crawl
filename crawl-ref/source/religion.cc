@@ -734,17 +734,25 @@ void dec_penance(int val)
     dec_penance(you.religion, val);
 }
 
+void demigod_gain_faith(monster* mons)
+{
+    // 지능이 낮을 수록, 얻는 신앙도 적어진다. (뇌가 없다면 신앙을 얻을 수 없다.)
+    const int intel = mons_class_intel(mons->type);
+    // 높은 HD를 가졌을 수록, 굴복시켰을 때 얻는 신앙도 커진다.
+    const int hd = mons->get_experience_level();
+    // 높은 명성을 통해 얻는 신앙이 어느 정도 조정된다..
+    const int reputation = runes_in_pack(); 
+
+    gain_piety(intel * hd + reputation, 8);
+
+}
+
 void demigod_penance(god_type god, int val)
 {
-    int reputation = 0;
-    for (int i = 0; i < NUM_RUNE_TYPES; i++)
-        if (you.runes[i])
-            ++reputation; 
+    int reputation = runes_in_pack();
     // Demigod will not be focused by gods.
     if (reputation == 0)
-    {
         return;
-    }
 
     if (x_chance_in_y(reputation, 100))
     {

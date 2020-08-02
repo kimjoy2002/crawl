@@ -79,47 +79,51 @@ void demigod_bend(monster* mons)
         return;
 
     if (!mons->is_summoned()
+        && !mons->is_illusion()
         && !testbits(mons->flags, MF_ATT_CHANGE_ATTEMPT)
         && !mons->friendly()
         && mons->alive())
     {
+
+        mprf("%d", you.piety);
+
         mons->flags |= MF_ATT_CHANGE_ATTEMPT;
 
         const int hd = mons->get_experience_level();
+        const int your_power = random2(you.piety / 15) + random2(4 + you.experience_level / 3);
+        mprf("%d vs %d", your_power, hd);
 
-        if (random2(you.piety / 15) + random2(4 + you.experience_level / 3)
-                 < random2(hd) + hd + random2(5))
-       {
+        if (your_power < hd)
            return;
-       }
 
     int powc = 30 + you.piety/10;
 
-    int heal_div = 3;
+    int div = 3;
     //
     if (mons_class_holiness(montype) & MH_UNDEAD)
-        heal_div = 2;
+        div = 2;
     if (mons_class_holiness(montype) & MH_HOLY)
-        heal_div = 5;
+        div = 5;
     if (mons_class_holiness(montype) & MH_DEMONIC)
-        heal_div = 5;
+        div = 5;
+    if (mons->god != GOD_NO_GOD)
+        div = 10;
 
-    //_pacification_sides
+    int reputation = static_cast<int>(you.runes.count());
+
+    //Lower hp means Higher possibilties of bending.
     const int mon_hp = montype == MONS_PANDEMONIUM_LORD ? 1000 : mons_avg_hp(montype);
-    const int heal_mult = (mons_class_intel(montype) < I_HUMAN) ? 3 : 1;
-    // ignoring monster holiness & int
-    const int sides = heal_mult * powc * 2 / heal_div;
+    const int sides = powc * 2 / div;
     const int pacified_roll = biased_random2(sides - 1,2);
-
-        if (max(sides, pacified_roll) < mon_hp)
+    mprf("%d vs %d", max(sides, pacified_roll), mon_hp);
+        if (max(sides, pacified_roll) > mons->hit_points)
         {
             record_monster_defeat(mons, KILL_PACIFIED);
-            mons_pacify(*mons, ATT_NEUTRAL);
-            mons->attitude = ATT_GOOD_NEUTRAL;
+            mons_pacify(*mons, ATT_GOOD_NEUTRAL);
+            demigod_gain_faith(mons);
             mons->flags |= MF_NO_REWARD;
             mons->god == GOD_NO_GOD;
             stop_running();
-            gain_piety(mon_hp, 10);
         }
 
         if (mons->god != GOD_NO_GOD)

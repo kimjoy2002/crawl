@@ -49,6 +49,9 @@ bool active_penance(god_type god);
 bool xp_penance(god_type god);
 void dec_penance(int val);
 void dec_penance(god_type god, int val);
+
+/* Demigod */
+void demigod_gain_faith(monster* mons);
 void demigod_penance(god_type god, int val);
 
 void excommunication(bool voluntary = false, god_type new_god = GOD_NO_GOD);

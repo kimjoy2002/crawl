@@ -69,6 +69,7 @@ struct player_info
     int num_turns;
     int lives, deaths;
     string heads; //maybe int is better?
+    bool has_hydra_multi_attack;
 
     string place;
     int depth;

@@ -239,6 +239,7 @@ void apply_daction_to_mons(monster* mon, daction_type act, bool local,
             // monster changes attitude
             bool hostile = you.get_mutation_level(MUT_NO_LOVE);
             mon->attitude = hostile ? ATT_HOSTILE : ATT_GOOD_NEUTRAL;
+            demigod_gain_faith(mon);
             mons_att_changed(mon);
             mon->flags |= MF_NAME_REPLACE | MF_NAME_DESCRIPTOR
                               | MF_NAME_NOCORPSE;
@@ -440,6 +441,7 @@ static void _daction_hog_to_human(monster *mon, bool in_transit)
             mon->attitude = ATT_GOOD_NEUTRAL;
             mon->flags   |= MF_WAS_NEUTRAL;
             mons_att_changed(mon);
+            demigod_gain_faith(mon);
         }
     }
 
