@@ -53,6 +53,7 @@ void dec_penance(god_type god, int val);
 /* Demigod */
 void demigod_gain_faith(monster* mons);
 void demigod_penance(god_type god, int val);
+void demigod_perish_altar();
 
 void excommunication(bool voluntary = false, god_type new_god = GOD_NO_GOD);
 

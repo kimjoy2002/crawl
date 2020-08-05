@@ -761,6 +761,23 @@ void demigod_penance(god_type god, int val)
     }
 }
 
+// "p" for perish
+void demigod_perish_altar()
+{
+    const int god = grd(you.pos())-DNGN_ALTAR_ZIN;
+    if (0 <= god && god < NUM_GODS)
+    {
+        string prompt = "Do you really want the altar to be perished? It makes you suffer an endless wrath of the god.";
+        if (!yes_or_no("%s", prompt.c_str()))
+        {
+            canned_msg(MSG_OK);
+            return;
+        }
+        grd(you.pos()) = DNGN_FLOOR;
+        demigod_penance((god_type)god+1, 1000);
+    }
+}
+
 // TODO: find out what this is duplicating & deduplicate it
 static bool _need_water_walking()
 {
@@ -2842,8 +2859,11 @@ void excommunication(bool voluntary, god_type new_god)
     {
         you.innate_mutation[MUT_NEGATIVE_ENERGY_RESISTANCE]--;
         delete_mutation(MUT_NEGATIVE_ENERGY_RESISTANCE, "species change", false, true, false, false);
-        you.innate_mutation[MUT_HOLY_BITE]--;
-        delete_mutation(MUT_HOLY_BITE, "species change", false, true, false, false);
+        if (you.innate_mutation[MUT_HOLY_BITE])
+        {
+            you.innate_mutation[MUT_HOLY_BITE]--;
+            delete_mutation(MUT_HOLY_BITE, "species change", false, true, false, false);
+        }    
         
         change_draconian_colour();
         give_level_mutations(you.species, 7); //for draconian
