@@ -929,7 +929,7 @@ void tileidx_out_of_los(tileidx_t *fg, tileidx_t *bg, tileidx_t *cloud, const co
     // written to what the player remembers. We'll feather that in here.
 
     // save any rays, which will get overwritten by mapped terrain
-    auto rays = *bg & (TILE_FLAG_RAY_MULTI | TILE_FLAG_RAY_OOR | TILE_FLAG_RAY
+    auto rays = *bg & (TILE_FLAG_RAY_MULTI | TILE_FLAG_RAY_BI | TILE_FLAG_RAY_OOR | TILE_FLAG_RAY
                         | TILE_FLAG_LANDING);
 
     const map_cell &cell = env.map_knowledge(gc);
@@ -3520,6 +3520,8 @@ tileidx_t tileidx_ability(const ability_type ability)
         return TILEG_ABILITY_EVOKE_THUNDER;
     case ABIL_EVOKE_PAVISE:
         return TILEG_ABILITY_DEPLOY_SHIELD;
+    case ABIL_GOLEM_FORM:
+        return TILEG_ABILITY_GOLEM_FORM;
 
     // Divine abilities
     // Zin
@@ -3601,6 +3603,8 @@ tileidx_t tileidx_ability(const ability_type ability)
         return TILEG_ABILITY_TROG_HAND;
     case ABIL_TROG_BROTHERS_IN_ARMS:
         return TILEG_ABILITY_TROG_BROTHERS_IN_ARMS;
+    case ABIL_TROG_CHARGE:
+        return TILEG_ABILITY_TROG_CHARGE;
     case ABIL_TROG_BLESS_WEAPON:
         return TILEG_ABILITY_TROG_BLESS_WEAPON;
     // Elyvilon

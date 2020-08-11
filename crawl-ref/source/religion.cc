@@ -213,6 +213,7 @@ const vector<god_power> god_powers[NUM_GODS] =
       { 5, "Trog will now gift you weapons as you gain piety.",
            "Trog will no longer gift you weapons.",
            "Trog will gift you weapons as you gain piety." },
+      { 6, ABIL_TROG_CHARGE, "push yourself into berserk rage to charge and daze a target" },
       { 7, ABIL_TROG_BLESS_WEAPON,
            "Trog will bless your weapon with antimagic... once.",
            "Trog is no longer ready to bless your weapon." },
@@ -3294,8 +3295,11 @@ bool player_can_join_god(god_type which_god)
         }
     }
 
-    if (you.species == SP_MUMMY && which_god == GOD_WYRM)
-        return false;
+    if (you.species == SP_MUMMY || you.species == SP_LICH) {
+        if (which_god == GOD_WYRM) {
+            return false;
+        }
+    }
 
     if (you.species == SP_LESSER_LICH || you.species == SP_LICH) {
         if (which_god == GOD_ZIN ||

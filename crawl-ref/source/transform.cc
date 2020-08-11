@@ -1023,6 +1023,14 @@ public:
     }
 };
 
+class FormGolem : public Form
+{
+private:
+    FormGolem() : Form(transformation::golem) { }
+    DISALLOW_COPY_AND_ASSIGN(FormGolem);
+public:
+    static const FormGolem &instance() { static FormGolem inst; return inst; }
+};
 
 
 
@@ -1054,6 +1062,7 @@ static const Form* forms[] =
     &FormHydra::instance(),
     &FormHolySwine::instance(),
     &FormEldritch::instance(),
+    &FormGolem::instance(),
 };
 
 const Form* get_form(transformation xform)
@@ -1972,6 +1981,26 @@ bool transform(int pow, transformation which_trans, bool involuntary,
         you.malmutate("eldritch form");
         break;
 
+    case transformation::golem:
+        if (you.attribute[ATTR_HELD])
+        {
+            trap_def *trap = trap_at(you.pos());
+            if (trap && trap->type == TRAP_WEB)
+            {
+                mpr("You shred the web into pieces!");
+                destroy_trap(you.pos());
+            }
+            int net = get_trapping_net(you.pos());
+            if (net != NON_ITEM)
+            {
+                mpr("The net rips apart!");
+                destroy_item(net);
+            }
+
+            stop_being_held();
+        }
+        break;
+
     default:
         break;
     }
@@ -1996,7 +2025,7 @@ bool transform(int pow, transformation which_trans, bool involuntary,
 
 
     // If we are no longer living, end an effect that afflicts only the living
-    if (you.duration[DUR_FLAYED] && !(you.holiness() & MH_NATURAL))
+    if (you.duration[DUR_FLAYED] && (!(you.holiness() & MH_NATURAL) || which_trans == transformation::eldritch))
     {
         // Heal a little extra if we gained max hp from this transformation
         if (form_hp_mod() != 10)
@@ -2199,6 +2228,7 @@ void untransform(bool skip_move)
             you.stop_being_constricted();
     }
 
+    notify_stat_change();
     you.turn_is_over = true;
     if (you.transform_uncancellable)
         you.transform_uncancellable = false;
