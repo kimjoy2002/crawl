@@ -169,6 +169,8 @@ static bool _fill_out_corpse(const monster& mons, item_def& corpse)
         if (saved_mon.max_hit_points <= 0)
             saved_mon.max_hit_points = 1;
         saved_mon.hit_points = saved_mon.max_hit_points;
+
+        corpse.freshness += have_passive(passive_t::conserve_orc_corpses)? you.piety/2 : 0;
     }
 
     return true;
@@ -441,7 +443,7 @@ static void _gold_pile(item_def &corpse, monster_type corpse_class)
     you.redraw_title = true;
 }
 
-void _blood_spray_with_cigotuvis(const monster* mons, int level)
+static void _blood_spray_with_cigotuvis(const monster* mons, int level)
 {
     coord_def origin = mons->pos();
     monster_type montype = mons->type;
@@ -735,9 +737,12 @@ item_def* place_monster_corpse(const monster& mons, bool silent, bool force)
     const bool no_coinflip = mons.props.exists("always_corpse")
                              || force
                              || goldify;
-
+ 
+    const int weight = have_passive(passive_t::conserve_orc_corpses) 
+                        && (mons_genus(mons.type) == MONS_ORC) ? 500 - you.piety : 500;
     // 50/50 chance of getting a corpse, usually.
-    if (!no_coinflip && coinflip())
+    // If you believe Beogh, Beogh conserves orc corpses.
+    if (!no_coinflip && x_chance_in_y(weight,1000))
         return nullptr;
 
     // The game can attempt to place a corpse for an out-of-bounds monster
@@ -872,7 +877,7 @@ item_def* place_monster_corpse(const monster& mons, bool silent, bool force)
             // Always identify said potion.
             set_ident_type(essence, true);
         
-            mprf(MSGCH_GOD, " extract %s from the corpse.",
+            mprf(MSGCH_GOD, "The Great Wyrm extracts %s from the corpse.",
                 essence.name(DESC_A).c_str());
 
             std::map<int, int> tmp_l_p = you.last_pickup;
@@ -2044,6 +2049,9 @@ item_def* monster_die(monster& mons, killer_type killer,
     // ... and liquefiers.
     mons.del_ench(ENCH_LIQUEFYING);
 
+    // ... and healing-emitters.
+    mons.del_ench(ENCH_HEALING_AURA);
+
     // ... and wind-stillers.
     mons.del_ench(ENCH_STILL_WINDS, true);
 
@@ -3016,7 +3024,8 @@ void monster_cleanup(monster* mons)
     if (mons->halo_radius()
         || mons->umbra_radius()
         || mons->silence_radius()
-        || mons->antimagic_radius())
+        || mons->antimagic_radius()
+        || mons->healaura_radius())
     {
         invalidate_agrid();
     }

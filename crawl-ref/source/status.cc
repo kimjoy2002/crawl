@@ -491,7 +491,7 @@ bool fill_status_info(int status, status_info& inf)
 
     case DUR_HOMUNCULUS_WILD_MAGIC:
         inf.light_text
-            = make_stringf("Wild (%u)",
+            = make_stringf("Unstable (%u)",
                 you.props[HOMUNCULUS_WILD_MAGIC].get_int());
         break;
 
@@ -685,6 +685,16 @@ bool fill_status_info(int status, status_info& inf)
             inf.long_text    = "You are horrified!";
         }
         break;
+    }
+
+
+    case DUR_COMBAT_MANA:
+    {
+        const int mana = you.props[COMBAT_MANA_KEY].get_int();
+        inf.light_colour = mana >= 3 ? WHITE :(mana >= 2 ? LIGHTBLUE : BLUE);
+        inf.light_text = make_stringf("Mana+%s%s", mana>= 2 ? "+" : "", mana >= 3 ? "+" : "");
+        inf.short_text = "mana regen";
+        inf.long_text = "Your mana regeneration has increased.";
     }
 
     case STATUS_CLOUD:

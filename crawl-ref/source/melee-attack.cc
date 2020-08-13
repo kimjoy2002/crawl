@@ -464,9 +464,101 @@ bool melee_attack::handle_phase_hit()
             you.species == SP_ADAPTION_HOMUNCULUS ||
             you.species == SP_BLOSSOM_HOMUNCULUS))
     {
-        if (you.duration[DUR_HOMUNCULUS_WILD_MAGIC] && coinflip()) {
+        if (you.duration[DUR_HOMUNCULUS_WILD_MAGIC])
+        {
+            const int unstability_pow = you.props[HOMUNCULUS_WILD_MAGIC].get_int();
+            const int unstability_dmg = 2 + random2(unstability_pow) + random2(unstability_pow);
+
+            switch (random2(4))
+            {
+            case 0:
+                special_damage = resist_adjust_damage(defender, BEAM_ELECTRICITY, unstability_dmg);
+
+                if (you.species == SP_BLOSSOM_HOMUNCULUS)
+                    special_damage *= 2;
+
+                if (special_damage)
+                {
+                    special_damage_message = make_stringf("%s %s electrocuted!",
+                         defender->name(DESC_THE).c_str(), defender->conj_verb("are").c_str());
+                    special_damage_flavour = BEAM_ELECTRICITY;
+                    if (you.species == SP_ADAPTION_HOMUNCULUS)
+                    {
+                        mpr("You feel your magic recycled.");
+                            inc_mp(1);
+                    }
+                }
+    
+                break;
+    
+            case 1:
+                special_damage = resist_adjust_damage(defender, BEAM_COLD, unstability_dmg);
+
+                if (you.species == SP_BLOSSOM_HOMUNCULUS)
+                    special_damage *= 2;
+
+                if (special_damage)
+                {
+                    special_damage_message = make_stringf("%s freeze%s %s!",
+                        attacker->name(DESC_THE).c_str(),
+                        attacker->is_player() ? "" : "s",
+                        defender->name(DESC_THE).c_str());
+                    special_damage_flavour = BEAM_COLD;
+                    if (you.species == SP_ADAPTION_HOMUNCULUS)
+                    {
+                        mpr("You feel your magic recycled.");
+                            inc_mp(1);
+                    }
+                }
+                break;
+    
+            case 2:
+                special_damage = unstability_dmg;
+
+                if (you.species == SP_BLOSSOM_HOMUNCULUS)
+                    special_damage *= 2;
+
+                special_damage = apply_defender_ac(special_damage);
+    
+                if (special_damage > 0)
+                {
+                    special_damage_message = make_stringf("%s crush%s %s!",
+                            attacker->name(DESC_THE).c_str(),
+                            attacker->is_player() ? "" : "es",
+                            defender->name(DESC_THE).c_str());
+                    if (you.species == SP_ADAPTION_HOMUNCULUS)
+                    {
+                        mpr("You feel your magic recycled.");
+                            inc_mp(1);
+                    }
+                }
+                break;
+    
+            case 3:
+                special_damage = resist_adjust_damage(defender, BEAM_FIRE, unstability_dmg);
+
+                if (you.species == SP_BLOSSOM_HOMUNCULUS)
+                    special_damage *= 2;
+
+                if (special_damage)
+                {
+                    special_damage_message = make_stringf("%s burn%s %s!",
+                            attacker->name(DESC_THE).c_str(),
+                            attacker->is_player() ? "" : "s",
+                            defender->name(DESC_THE).c_str());
+                    special_damage_flavour = BEAM_FIRE;
+                    if (you.species == SP_ADAPTION_HOMUNCULUS)
+                    {
+                        mpr("You feel your magic recycled.");
+                            inc_mp(1);
+                    }
+                }
+                break;
+            }
+
             you.props[HOMUNCULUS_WILD_MAGIC].get_int()--;
-            if (you.props[HOMUNCULUS_WILD_MAGIC].get_int() == 0) {
+            if (you.props[HOMUNCULUS_WILD_MAGIC].get_int() == 0)
+            {
                 you.duration[DUR_HOMUNCULUS_WILD_MAGIC] = 0;
             }
         }
@@ -1130,6 +1222,8 @@ bool melee_attack::attack()
 
         if (ev_margin >= 0)
         {
+            if (attacker->is_player() && you.has_hydra_multi_attack() && x_chance_in_y(1,3) && cleaving)
+                handle_phase_dodged();
             bool cont = handle_phase_hit();
 
             attacker_sustain_passive_damage();
@@ -2303,8 +2397,8 @@ bool melee_attack::consider_decapitation(int dam, int damage_type)
     {
         if (defender_visible)
             mpr("The flame cauterises the wound!");
-            if (defender->is_player() && defender->heads() == 0)
-                defender->hurt(attacker, INSTANT_DEATH);
+        if (defender->is_player() && defender->heads() == 0)
+            defender->hurt(attacker, INSTANT_DEATH);
         return false;
     }
 
@@ -3671,6 +3765,24 @@ void melee_attack::do_spines()
 
             simple_monster_message(*attacker->as_monster(),
                                    " is struck by your spines.");
+
+            attacker->hurt(&you, hurt);
+        }
+
+        if (attacker->alive() && you.duration[DUR_SHRAPNEL])
+        {
+            // shrapenl_power is set when the infusion spell is cast
+            const int pow = you.props["shrapenl_power"].get_int();
+            const int dmg = 2 + div_rand_round(pow, 12);
+            const int hurt = defender->apply_ac(dmg);
+
+            dprf(DIAG_COMBAT, "Shrapnel: dmg = %d hurt = %d", dmg, hurt);
+
+            if (hurt <= 0)
+                return;
+
+            simple_monster_message(*attacker->as_monster(),
+                                   " is struck by your shrapenls.");
 
             attacker->hurt(&you, hurt);
         }

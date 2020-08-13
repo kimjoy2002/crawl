@@ -213,6 +213,7 @@ const vector<god_power> god_powers[NUM_GODS] =
       { 5, "Trog will now gift you weapons as you gain piety.",
            "Trog will no longer gift you weapons.",
            "Trog will gift you weapons as you gain piety." },
+      { 6, ABIL_TROG_CHARGE, "push yourself into berserk rage to charge and daze a target" },
       { 7, ABIL_TROG_BLESS_WEAPON,
            "Trog will bless your weapon with antimagic... once.",
            "Trog is no longer ready to bless your weapon." },
@@ -260,8 +261,8 @@ const vector<god_power> god_powers[NUM_GODS] =
       { 5, "walk on water" },
       { 5, ABIL_BEOGH_GIFT_ITEM, "give items to your followers" },
       { 6, ABIL_BEOGH_RESURRECTION, "revive fallen orcs" },
-      { 6, "Your resistance will partially share with your followers",
-           "You will no longer share resistance with your followers" },
+      { 6, "Your resistance will partially share with your followers.",
+           "You will no longer share resistance with your followers." },
     },
 
     // Jiyva
@@ -2813,10 +2814,13 @@ void excommunication(bool voluntary, god_type new_god)
         && !is_good_god(new_god)
         && you.species == SP_PEARL_DRACONIAN)
     {
-        you.innate_mutation[MUT_NEGATIVE_ENERGY_RESISTANCE]--;
+        you.innate_mutation[MUT_NEGATIVE_ENERGY_RESISTANCE]--;  // Level 7
         delete_mutation(MUT_NEGATIVE_ENERGY_RESISTANCE, "species change", false, true, false, false);
-        you.innate_mutation[MUT_HOLY_BITE]--;
-        delete_mutation(MUT_HOLY_BITE, "species change", false, true, false, false);
+        if (you.innate_mutation[MUT_HOLY_BITE]) // Level 14
+        {
+            you.innate_mutation[MUT_HOLY_BITE]--;
+            delete_mutation(MUT_HOLY_BITE, "species change", false, true, false, false);
+        }
         
         change_draconian_colour();
         give_level_mutations(you.species, 7); //for draconian
@@ -3148,7 +3152,7 @@ static bool _transformed_player_can_join_god(god_type which_god)
     if (which_god == GOD_ZIN && you.form != transformation::none)
         return false; // zin hates everything
 
-    if (which_god == GOD_WYRM && you.form != transformation::lich)
+    if (which_god == GOD_WYRM && you.form == transformation::lich)
         return false; // The Great Wyrm dislikes lich, because they can't drink
 
     // all these clauses are written with a ! in front of them, so that
@@ -3239,8 +3243,19 @@ bool player_can_join_god(god_type which_god)
         }
     }
 
-    if (you.species == SP_MUMMY && which_god == GOD_WYRM)
-        return false;
+    if (you.species == SP_MUMMY || you.species == SP_LICH) {
+        if (which_god == GOD_WYRM) {
+            return false;
+        }
+    }
+
+    if (you.species == SP_LESSER_LICH || you.species == SP_LICH) {
+        if (which_god == GOD_ZIN ||
+            which_god == GOD_SHINING_ONE ||
+            which_god == GOD_ELYVILON) {
+            return false;
+        }
+    }
 
     return _transformed_player_can_join_god(which_god);
 }

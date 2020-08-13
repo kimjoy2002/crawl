@@ -126,6 +126,8 @@ const int MAPGEN_BORDER    = 2;
 // changing this affects the total number of shops in a game
 #define MAX_RANDOM_SHOPS  5
 
+/**Mercenary Temporary**/
+
 #define MAX_BRANCH_DEPTH 27
 COMPILE_CHECK(MAX_BRANCH_DEPTH < 256); // 8 bits
 
@@ -134,7 +136,7 @@ COMPILE_CHECK(MAX_BRANCH_DEPTH < 256); // 8 bits
 
 const int MAX_SKILL_LEVEL = 27;
 const int MAX_EXP_TOTAL = 8999999;
-const int EXERCISE_QUEUE_SIZE = 100;
+const int EXERCISE_QUEUE_SIZE = 100	;
 
 const int MIN_HIT_MISS_PERCENTAGE = 5;
 

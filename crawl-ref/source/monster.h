@@ -115,6 +115,7 @@ public:
     static uint32_t last_client_id;
 
     bool went_unseen_this_turn;
+    bool blessed;                       // Is this monster blessed?
     coord_def unseen_pos;
 
 public:
@@ -434,6 +435,7 @@ public:
     int umbra_radius() const override;
     int heat_radius() const override;
     int antimagic_radius() const override;
+    int healaura_radius() const override;
     bool petrified() const override;
     bool petrifying() const override;
     bool liquefied_ground() const override;

@@ -732,10 +732,10 @@ static const duration_def duration_data[] =
       {{ "Your noxious spew wanes." }}},
 
     { DUR_HOMUNCULUS_WILD_MAGIC,
-      MAGENTA, "Wild",
-      "wild magic", "",
-      "Casting spells uprouses your spell.", D_DISPELLABLE,
-      {{ "Your magic seems less wild.", []() {
+      MAGENTA, "Unstable",
+      "unstable magic", "",
+      "Your magic becomes powerful but unstable.", D_DISPELLABLE,
+      {{ "You feel your magic has stabilized.", []() {
           you.props.erase(HOMUNCULUS_WILD_MAGIC);
     }}} },
      { DUR_ELEMENTAL_WEAPON, LIGHTGRAY, "Elem", "", "Elemental", "Elemental", D_NO_FLAGS,
@@ -778,6 +778,17 @@ static const duration_def duration_data[] =
       "Citrinitas", "Citrinitas", "Your accuracy and spells are empowered!", D_NO_FLAGS,
       {{ "You feel less empowered." },
       { "You start to feel a little less empowered", 1}}, 6},
+    { DUR_COMBAT_MANA,
+      LIGHTBLUE, "Mana+",
+      "mana regen", "",
+      "Your mana regeneration has increased.", D_NO_FLAGS },
+    { DUR_SHRAPNEL,
+      BLUE, "Sharpnel",
+      "sharpnel curtain", "",
+      "You are surrounded by gravels and pebbles.", D_DISPELLABLE | D_EXPIRES,
+      {{ "Your curtain of sharpnel falls." },
+        { "Your sharpnels begin to scatter." }}, 6},
+    { DUR_CARAVAN_MERCENARY, 0, "", "", "caravan delay", "", D_NO_FLAGS},
 #if TAG_MAJOR_VERSION == 34
     // And removed ones
     { DUR_MAGIC_SAPPED, 0, "", "", "old magic sapped", "", D_NO_FLAGS},

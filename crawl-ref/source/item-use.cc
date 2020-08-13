@@ -3500,7 +3500,7 @@ void random_uselessness()
         break;
 
     case 3:
-        if (you.species == SP_MUMMY)
+        if (you.species == SP_MUMMY || you.species == SP_LICH)
             mpr("Your bandages flutter.");
         else // if (you.can_smell())
             mprf("You smell %s.", _weird_smell().c_str());
@@ -3513,7 +3513,7 @@ void random_uselessness()
     case 5:
         if (you.get_mutation_level(MUT_BEAK) || one_chance_in(3))
             mpr("Your brain hurts!");
-        else if (you.species == SP_MUMMY || coinflip())
+        else if (you.species == SP_MUMMY || you.species == SP_LICH || coinflip())
             mpr("Your ears itch!");
         else
             mpr("Your nose twitches suddenly!");
@@ -3954,11 +3954,7 @@ void read_scroll(item_def& scroll)
         break;
 
     case SCR_ACQUIREMENT:
-        if (!alreadyknown)
-        {
-            mpr(pre_succ_msg);
             mpr("This is a scroll of acquirement!");
-        }
 
         // included in default force_more_message
         // Identify it early in case the player checks the '\' screen.
@@ -4221,7 +4217,8 @@ void read_scroll(item_def& scroll)
 #if TAG_MAJOR_VERSION == 34
         && which_scroll != SCR_RECHARGING
 #endif
-        && which_scroll != SCR_AMNESIA)
+        && which_scroll != SCR_AMNESIA
+        && which_scroll != SCR_ACQUIREMENT)
     {
         mprf("It %s a %s.",
              scroll.quantity < prev_quantity ? "was" : "is",

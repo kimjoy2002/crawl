@@ -59,7 +59,7 @@ static const map<job_type, job_def> job_data =
     "Ar", "Artificer",
     4, 3, 5,
     { SP_DEEP_DWARF, SP_HALFLING, SP_KOBOLD, SP_SPRIGGAN, SP_BASE_DRACONIAN,
-      SP_DEMONSPAWN, },
+      SP_DEMONSPAWN, SP_HOMUNCULUS, },
     { "short sword", "leather armour", "wand of flame charges:15",
       "wand of enslavement charges:15", "wand of random effects charges:15" },
     WCHOICE_NONE,
@@ -87,6 +87,16 @@ static const map<job_type, job_def> job_data =
     { "animal skin" },
     WCHOICE_PLAIN,
     { { SK_FIGHTING, 3 }, { SK_DODGING, 2 }, { SK_WEAPON, 3 }, },
+} },
+
+{ JOB_CARAVAN, {
+    "Ca", "Caravan",
+   4, 4, 4,
+    { SP_SPRIGGAN, SP_CENTAUR, SP_OCTOPODE, SP_FELID, SP_DEMIGOD,
+      SP_HUMAN, SP_DEMONSPAWN, },
+    { "dagger", "robe", "ration q:5", "gold q:150", "wand of heal wounds charges:3" },
+    WCHOICE_NONE,
+    { },
 } },
 
 { JOB_CHAOS_KNIGHT, {
@@ -219,7 +229,7 @@ static const map<job_type, job_def> job_data =
 { JOB_SKALD, {
     "Sk", "Skald",
     3, 5, 4,
-    { SP_HALFLING, SP_CENTAUR, SP_MERFOLK, SP_BASE_DRACONIAN, SP_VAMPIRE, },
+    { SP_HALFLING, SP_CENTAUR, SP_MERFOLK, SP_BASE_DRACONIAN, SP_VAMPIRE, SP_HOMUNCULUS, },
     { "leather armour", "book of Battle" },
     WCHOICE_PLAIN,
     { { SK_FIGHTING, 2 }, { SK_ARMOUR, 1 }, { SK_DODGING, 2 },

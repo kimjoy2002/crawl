@@ -1055,7 +1055,7 @@ static void _spellcasting_side_effects(spell_type spell, god_type god,
         {
             you.props[HOMUNCULUS_WILD_MAGIC].get_int()++;
             you.increase_duration(DUR_HOMUNCULUS_WILD_MAGIC, 10, 10);
-            mprf(MSGCH_WARN, "Your magic is getting wild.");
+            mprf(MSGCH_WARN, "Your magic is amplified and unstable.");
         }
 
         // Make some noise if it's actually the player casting.
@@ -2021,7 +2021,14 @@ static spret _do_cast(spell_type spell, int powc, const dist& spd,
         return cast_transform(powc, transformation::dragon, fail);
 
     case SPELL_NECROMUTATION:
-        return cast_transform(powc, transformation::lich, fail);
+    {
+        if (you.species == SP_LESSER_LICH) {
+            return change_lesser_lich(powc, fail);
+        }
+        else {
+            return cast_transform(powc, transformation::lich, fail);
+        }
+    }
 
     case SPELL_ELDRITCH_FORM:
         return cast_transform(powc, transformation::eldritch, fail);
@@ -2062,6 +2069,9 @@ static spret _do_cast(spell_type spell, int powc, const dist& spd,
 
     case SPELL_PORTAL_PROJECTILE:
         return cast_portal_projectile(powc, fail);
+
+    case SPELL_SHRAPNEL_CURTAIN:
+        return cast_shrapnel_curtain(powc, fail);
 
     // other
     case SPELL_BORGNJORS_REVIVIFICATION:

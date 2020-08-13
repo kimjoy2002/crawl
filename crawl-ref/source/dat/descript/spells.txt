@@ -58,6 +58,11 @@ Aura of Brilliance spell
 Empowers the magic of nearby wizard allies of the caster, allowing them to
 cast their magic more powerfully and more often.
 %%%%
+Aura of Healing spell
+
+Emits an auar of healing energy, heals nearby allies; except you, who wasn't
+enough to adapt in the atmosphere of the Dungeon.
+%%%%
 Avatar Song spell
 
 Sings a powerfully haunting song; in addition to making nearby victims
@@ -1309,6 +1314,12 @@ walls.
 Shock spell
 
 Throws a bouncing bolt of electricity. It partially bypasses armour.
+%%%%
+Shrapnel Curtain spell
+
+Forms a curtain surrounded the caster, with spiny pebbles and gravels. These are
+made by dusts in the Dungeon, and reacts when the caster has been attacked, will
+be fired to the attacker to deal damage easily prevented by armor.
 %%%%
 Shroud of Golubria spell
 

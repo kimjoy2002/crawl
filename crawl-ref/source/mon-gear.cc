@@ -172,7 +172,20 @@ static void _give_wand(monster* mon, int level)
 
 static void _give_potion(monster* mon, int level)
 {
-    if (mons_is_unique(mon->type) && one_chance_in(4)
+    if (mon->type == MONS_ASCLEPIA)
+    {
+        const int which_potion = (coinflip() ? POT_HEAL_WOUNDS : POT_INVISIBILITY);
+
+        const int thing_created = items(false, OBJ_POTIONS, which_potion, level);
+
+        if (thing_created == NON_ITEM)
+            return;
+
+        mitm[thing_created].flags = 0;
+        give_specific_item(mon, thing_created);
+    }
+    
+    else if (mons_is_unique(mon->type) && one_chance_in(4)
                 && _should_give_unique_item(mon))
     {
         const int thing_created = items(false, OBJ_POTIONS, OBJ_RANDOM,
@@ -776,6 +789,10 @@ int make_mons_weapon(monster_type type, int level, bool melee_only)
         } },
         { MONS_URUG,                    { URUG_WEAPONS } },
         { MONS_FREDERICK,               { URUG_WEAPONS } },
+        { MONS_BRANDAGOTH, {
+            { { WPN_QUARTERSTAFF,        1 } }, {},
+            { { SPWPN_FLAMING, 1 } },
+        } },
         { MONS_FIRE_GIANT, {
             { { WPN_GREAT_SWORD,        1 } }, {},
             { { SPWPN_FLAMING, 1 } },
@@ -925,6 +942,9 @@ int make_mons_weapon(monster_type type, int level, bool melee_only)
               { SPWPN_DISTORTION,      2 },
               { SPWPN_CHAOS,           1 }, },
         } },
+        { MONS_MERC_FIGHTER, { { { WPN_FLAIL, 1 } } } },
+        { MONS_MERC_SKALD, { { { WPN_TRIDENT, 1 } } } },
+        { MONS_MERC_BRIGAND, { { { WPN_DAGGER, 1 } } } },
     };
 
     static const weapon_list ORC_KNIGHT_BOWS =
@@ -1211,11 +1231,23 @@ int make_mons_weapon(monster_type type, int level, bool melee_only)
         }
         break;
 
+    case MONS_ASCLEPIA:
+        force_item = true;
+        item.base_type = OBJ_STAVES;
+        item.sub_type = STAFF_POISON;
+        item.flags    |= ISFLAG_KNOW_TYPE;
+        break;
+
     case MONS_ANCESTOR_HEXER:
     case MONS_ANCESTOR_BATTLEMAGE:
     case MONS_ANCESTOR_KNIGHT:
         force_item = true;
         upgrade_hepliaklqana_weapon(type, item);
+        break;
+
+    case MONS_MERC_WITCH:
+        item.base_type = OBJ_STAVES;
+        item.sub_type  = random_choose(STAFF_FIRE, STAFF_COLD, STAFF_AIR, STAFF_EARTH);
         break;
 
     default:
@@ -1718,6 +1750,10 @@ static void _give_shield(monster* mon, int level)
     }
         break;
 
+    case MONS_MERC_FIGHTER:
+        make_item_for_monster(mon, OBJ_ARMOUR, ARM_SHIELD, 0);
+        break;
+
     default:
         break;
     }
@@ -2067,6 +2103,7 @@ int make_mons_armour(monster_type type, int level)
     case MONS_ORC_WIZARD:
     case MONS_BLORK_THE_ORC:
     case MONS_NERGALLE:
+    case MONS_BRANDAGOTH:
         item.base_type = OBJ_ARMOUR;
         item.sub_type  = ARM_ROBE;
         break;
@@ -2132,6 +2169,33 @@ int make_mons_armour(monster_type type, int level)
     case MONS_HALAZID_WARLOCK:
         item.base_type = OBJ_ARMOUR;
         item.sub_type  = random_choose(ARM_LEATHER_ARMOUR, ARM_ROBE);
+        break;
+
+    case MONS_ASCLEPIA:
+    {
+        force_item = true;
+        item.base_type = OBJ_ARMOUR;
+        item.sub_type  = ARM_CLOAK;
+        item.plus = 2;
+        set_item_ego_type(item, OBJ_ARMOUR, SPARM_CLOUD_IMMUNE);
+        item.flags |= ISFLAG_KNOW_TYPE;
+        break;
+    }
+
+    case MONS_MERC_FIGHTER:
+        item.base_type = OBJ_ARMOUR;
+        item.sub_type  = ARM_SCALE_MAIL;
+        break;
+
+    case MONS_MERC_SKALD:
+    case MONS_MERC_BRIGAND:
+        item.base_type = OBJ_ARMOUR;
+        item.sub_type  = ARM_LEATHER_ARMOUR;
+        break;
+
+    case MONS_MERC_WITCH:
+        item.base_type = OBJ_ARMOUR;
+        item.sub_type  = ARM_ROBE;
         break;
 
     default:

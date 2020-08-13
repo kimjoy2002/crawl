@@ -30,6 +30,7 @@
 #include "abyss.h" // abyss_maybe_spawn_xp_exit
 #include "act-iter.h"
 #include "areas.h"
+#include "attitude-change.h"
 #include "beam.h"
 #include "cio.h"
 #include "cloud.h"
@@ -343,6 +344,50 @@ static bool _monster_near_by_you()
     return false;
 }
 
+static void _end_combat_mana()
+{
+    if (!you.duration[DUR_COMBAT_MANA])
+        return;
+
+    you.props.erase(COMBAT_MANA_KEY);
+    you.set_duration(DUR_COMBAT_MANA, 0);
+}
+
+static void _update_combat_mana()
+{
+    int mut_level = you.get_mutation_level(MUT_COMBAT_MANA_REGENERATE);
+    if (!mut_level)
+    {
+        _end_combat_mana();
+        return;
+    }
+
+    int monster_num = 0, mana_regen_level = 0;
+    for (monster_near_iterator mi(you.pos(), LOS_NO_TRANS); mi; ++mi)
+    {
+        if (mons_is_threatening(**mi)
+            && !mi->wont_attack()
+            && !mi->neutral()
+            && !mi->submerged())
+        {
+            monster_num++;
+        }
+    }
+
+    mana_regen_level = min(mut_level, monster_num / 3);
+
+    if (mana_regen_level <= 0)
+    {
+        _end_combat_mana();
+        return;
+    }
+
+    // Lookup the old value before modifying it
+    //const int old_combat_level = _old_combat_level();
+
+    you.props[COMBAT_MANA_KEY] = mana_regen_level;
+    you.set_duration(DUR_COMBAT_MANA, 1);
+}
 
 /**
  * What was the player's most recent horror level?
@@ -514,6 +559,7 @@ void player_reacts_to_monsters()
 
     _maybe_melt_armour();
     _update_cowardice();
+    _update_combat_mana();
     if (you_worship(GOD_USKAYAW))
         _handle_uskayaw_time(you.time_taken);
 }
@@ -581,6 +627,56 @@ static void _try_to_respawn_ancestor()
     add_companion(ancestor);
     check_place_cloud(CLOUD_MIST, ancestor->pos(), random_range(1,2),
                       ancestor); // ;)
+}
+
+
+/**
+ * JOB_CARAVAN has starting mercenary
+ */
+static void _try_to_spawn_mercenary()
+{
+    const monster_type merctypes[] =
+    {
+        MONS_MERC_FIGHTER, MONS_MERC_SKALD,
+        MONS_MERC_WITCH, MONS_MERC_BRIGAND,
+    };
+
+    int merc;
+    monster* mon;
+
+    merc = you.props[CARAVAN_MERCENARY].get_int() > 0 ? you.props[CARAVAN_MERCENARY].get_int() - 1: random2(3);
+    ASSERT(merc < (int)ARRAYSZ(merctypes));
+
+    mgen_data mg(merctypes[merc], BEH_FRIENDLY,
+        you.pos(), MHITYOU, MG_FORCE_BEH, you.religion);
+
+    mg.extra_flags |= (MF_HARD_RESET);
+
+    monster tempmon;
+    tempmon.type = merctypes[merc];
+    if (give_monster_proper_name(tempmon, false))
+        mg.mname = tempmon.mname;
+    else
+        mg.mname = make_name();
+    // This is used for giving the merc better stuff in mon-gear.
+    mg.props["caravan_mercenary items"] = true;
+
+    mon = create_monster(mg);
+
+    if (!mon)
+        return;
+
+    mon->props["dbname"].get_string() = mons_class_name(merctypes[merc]);
+    redraw_screen();
+
+    for (mon_inv_iterator ii(*mon); ii; ++ii)
+        ii->flags &= ~ISFLAG_SUMMONED;
+    mon->flags &= ~MF_HARD_RESET;
+    mon->attitude = ATT_FRIENDLY;
+    mons_att_changed(mon);
+
+    simple_monster_message(*mon, " follows you as a mercenary.");
+    you.props[CARAVAN_MERCENARY] = 0;
 }
 
 
@@ -871,6 +967,15 @@ static void _decrement_durations()
         _try_to_respawn_ancestor();
     }
 
+    if (you.props[CARAVAN_MERCENARY].get_int() > 0)
+    {
+        if (!you.duration[DUR_CARAVAN_MERCENARY])
+            you.duration[DUR_CARAVAN_MERCENARY] = 5;
+        else if (you.duration[DUR_CARAVAN_MERCENARY] <= 1)
+            _try_to_spawn_mercenary();
+        else
+            you.duration[DUR_CARAVAN_MERCENARY] -= 1;
+    }
 
     if (you.duration[DUR_WALL_MELTING])
     {

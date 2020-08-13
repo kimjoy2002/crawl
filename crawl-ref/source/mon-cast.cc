@@ -211,6 +211,7 @@ static const map<spell_type, mons_spell_logic> spell_to_logic = {
         _fire_simple_beam,
         _selfench_beam_setup(BEAM_HEALING),
     } },
+
     { SPELL_TELEPORT_SELF, {
         [](const monster &caster)
         {
@@ -347,6 +348,10 @@ static const map<spell_type, mons_spell_logic> spell_to_logic = {
     { SPELL_FLAY, {
         [](const monster &caster) {
             const actor* foe = caster.get_foe(); // XXX: check vis?
+            if (foe && foe->is_player() && foe->as_player()->form == transformation::eldritch) {
+                //eldritch form
+                return false;
+            }
             return foe && (foe->holiness() & MH_NATURAL);
         },
         _cast_flay,
@@ -493,6 +498,23 @@ static const map<spell_type, mons_spell_logic> spell_to_logic = {
             const actor* foe = caster.get_foe();
             return foe && caster.can_constrict(foe, false);
         }, _cast_grasping_roots, } },
+	{ SPELL_AURA_OF_HEALING, {
+        [](const monster &caster) {
+            return !within_healaura(caster.pos());
+        },
+        [](monster &caster, mon_spell_slot, bolt&) {
+            if (you.can_see(caster))
+            {
+                mprf("%s begins to emit aura of healing!",
+                     caster.name(DESC_THE).c_str());
+            }
+
+            caster.add_ench(ENCH_HEALING_AURA);
+            invalidate_agrid(true);
+        },
+        nullptr,
+        MSPELL_NO_AUTO_NOISE,
+    } },
 };
 
 /// Is the 'monster' actually a proxy for the player?
@@ -2163,7 +2185,6 @@ static bool _valid_aura_of_brilliance_ally(const monster* caster,
     return mons_aligned(caster, target) && caster != target
            && target->is_actual_spellcaster();
 }
-
 
 /**
  * Print the message that the player sees after a battlecry goes off.
@@ -8287,6 +8308,7 @@ static bool _ms_waste_of_time(monster* mon, mon_spell_slot slot)
 
     // Don't use unless our foe is close to us and there are no allies already
     // between the two of us
+    case SPELL_NIGHTMARE_OF_CUBUS:
     case SPELL_WIND_BLAST:
         if (foe && foe->pos().distance_from(mon->pos()) < 4)
         {

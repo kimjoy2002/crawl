@@ -93,6 +93,10 @@ item_def* newgame_make_item(object_class_type base,
                             int sub_type, int qty, int plus,
                             int force_ego, bool force_tutorial)
 {
+    if (base == OBJ_GOLD) {
+        you.gold += qty;
+        return nullptr;
+    }
     // Don't set normal equipment in the tutorial.
     if (!force_tutorial && crawl_state.game_is_tutorial())
         return nullptr;
@@ -495,6 +499,9 @@ static void _setup_generic(const newgame_def& ng)
             //for melted knight
             you.chapter = CHAPTER_STARTING_SLIME;
         }
+    }
+    else if (ng.job == JOB_CARAVAN) {
+        you.props[CARAVAN_MERCENARY] = ng.job_specific + 1;
     }
 
     you.chr_class_name = get_job_name(you.char_class);
