@@ -2633,7 +2633,7 @@ static vector<formatted_string> _get_overview_resistances(
     const int rcorr = you.res_corr(calc_unid);
     out += _resist_composer("rCorr", cwidth, rcorr) + "\n";
 
-    const int rmuta = (you.rmut_from_item(calc_unid)
+    const int rmuta = (you.res_mut(calc_unid)
                        || you.get_mutation_level(MUT_MUTATION_RESISTANCE) == 3);
     if (rmuta)
         out += _resist_composer("rMut", cwidth, rmuta) + "\n";

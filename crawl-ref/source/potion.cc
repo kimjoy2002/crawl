@@ -853,12 +853,12 @@ public:
             return false;
 
         string msg = "Really drink that potion of mutation";
-        msg += you.rmut_from_item() ? " while resistant to mutation?" : "?";
+        msg += you.res_mut() ? " while resistant to mutation?" : "?";
         const bool zin_check = you_worship(GOD_ZIN)
                             && !have_passive(passive_t::cleanse_mut_potions);
         if (zin_check)
             msg += " Zin will disapprove.";
-        if (was_known && (zin_check || you.rmut_from_item())
+        if (was_known && (zin_check || you.res_mut())
                       && !yesno(msg.c_str(), false, 'n'))
         {
             canned_msg(MSG_OK);
@@ -1263,8 +1263,8 @@ public:
             return false;
 
         string msg = "Really drink that potion of unstable mutation";
-        msg += you.rmut_from_item() ? " while resistant to mutation?" : "?";
-        if (was_known && (you_worship(GOD_ZIN) || you.rmut_from_item())
+        msg += you.res_mut() ? " while resistant to mutation?" : "?";
+        if (was_known && (you_worship(GOD_ZIN) || you.res_mut())
             && !yesno(msg.c_str(), false, 'n'))
         {
             canned_msg(MSG_OK);

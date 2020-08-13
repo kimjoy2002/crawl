@@ -127,6 +127,11 @@ static void _moveto_maybe_repel_stairs()
     }
 }
 
+bool _demigod_has_rune(rune_type rune)
+{
+    return you.species == SP_DEMIGOD && you.runes[rune];
+}
+
 bool check_moveto_cloud(const coord_def& p, const string &move_verb,
                         bool *prompted)
 {
@@ -1401,7 +1406,7 @@ int player_hunger_rate(bool temp)
  */
 int player_total_spell_levels()
 {
-    return you.experience_level - 1 + you.skill(SK_SPELLCASTING, 2, true);
+    return you.experience_level - 1 + you.skill(SK_SPELLCASTING, 2, true) + _demigod_has_rune(RUNE_LOM_LOBON) ? 4 : 0;
 }
 
 /**
@@ -1501,6 +1506,9 @@ int player_res_fire(bool calc_unid, bool temp, bool items)
         if (temperature_effect(LORC_FIRE_RES_III))
             rf++;
     }
+
+    if (_demigod_has_rune(RUNE_CEREBOV))
+        rf++;
 
     // mutations:
     rf += you.get_mutation_level(MUT_HEAT_RESISTANCE, temp);
@@ -1613,13 +1621,16 @@ int player_res_cold(bool calc_unid, bool temp, bool items)
     if (you.species == SP_DJINNI)
         rc--;
 
+    if (_demigod_has_rune(RUNE_COCYTUS))
+        rc++;
+
     // mutations:
     rc += you.get_mutation_level(MUT_COLD_RESISTANCE, temp);
     rc -= you.get_mutation_level(MUT_COLD_VULNERABILITY, temp);
     rc -= you.get_mutation_level(MUT_TEMPERATURE_SENSITIVITY, temp);
     rc += you.get_mutation_level(MUT_ICY_BLUE_SCALES, temp) == 3 ? 1 : 0;
     rc += you.get_mutation_level(MUT_SHAGGY_FUR, temp) == 3 ? 1 : 0;
-
+    
     if (rc < -3)
         rc = -3;
     else if (rc > 3)
@@ -1642,6 +1653,8 @@ bool player::res_corr(bool calc_unid, bool items) const
     if (you.duration[DUR_RESISTANCE])
         return true;
 
+    if (_demigod_has_rune(RUNE_SLIME))
+        return true;
     // TODO: why doesn't this use the usual form suppression mechanism?
     if (form_keeps_mutations()
         && get_mutation_level(MUT_YELLOW_SCALES) >= 3)
@@ -1678,6 +1691,8 @@ int player_res_electricity(bool calc_unid, bool temp, bool items)
         if (calc_unid && player_equip_unrand(UNRAND_DRAGONSKIN) && coinflip())
             re++;
     }
+    if (_demigod_has_rune(RUNE_DIS))
+        re++;
 
     // mutations:
     re += you.get_mutation_level(MUT_THIN_METALLIC_SCALES, temp) == 3 ? 1 : 0;
@@ -1721,6 +1736,9 @@ bool player_res_torment(bool random)
     {
         return true;
     }
+
+    if (_demigod_has_rune(RUNE_TOMB))
+        return true;
 
     return get_form()->res_neg() == 3
            || you.species == SP_VAMPIRE && !you.vampire_alive
@@ -1788,6 +1806,9 @@ int player_res_poison(bool calc_unid, bool temp, bool items)
         if (calc_unid && player_equip_unrand(UNRAND_DRAGONSKIN) && coinflip())
             rp++;
     }
+
+    if (_demigod_has_rune(RUNE_SNAKE) || _demigod_has_rune(RUNE_SPIDER))
+        rp++;
 
     // mutations:
     rp += you.get_mutation_level(MUT_POISON_RESISTANCE, temp);
@@ -1858,6 +1879,9 @@ int player_spec_death()
 
     if (you.species == SP_LICH)
         sd++;
+    
+    if (_demigod_has_rune(RUNE_TARTARUS))
+        sd++;
 
     return sd;
 }
@@ -1879,6 +1903,9 @@ int player_spec_fire()
         sf++;
 
     if (player_equip_unrand(UNRAND_ELEMENTAL_STAFF))
+        sf++;
+
+    if (_demigod_has_rune(RUNE_CEREBOV))
         sf++;
 
     return sf;
@@ -1903,6 +1930,10 @@ int player_spec_cold()
     {
         sc--;
     }
+
+    if (_demigod_has_rune(RUNE_COCYTUS))
+        sc++;
+
     return sc;
 }
 
@@ -2044,6 +2075,15 @@ int player_prot_life(bool calc_unid, bool temp, bool items)
 
         pl += you.wearing(EQ_STAFF, STAFF_DEATH, calc_unid);
     }
+
+    if (_demigod_has_rune(RUNE_TARTARUS))
+        pl++;
+
+    if (_demigod_has_rune(RUNE_GLOORX_VLOQ))
+        pl++;
+    
+    if (_demigod_has_rune(RUNE_TOMB))
+        pl++;
 
     // undead/demonic power
     pl += you.get_mutation_level(MUT_NEGATIVE_ENERGY_RESISTANCE, temp);
@@ -6709,6 +6749,11 @@ int player::res_acid(bool calc_unid) const
     return player_res_acid(calc_unid);
 }
 
+bool player::res_damnation() const
+{
+    return _demigod_has_rune(RUNE_GEHENNA);
+}
+
 int player::res_fire() const
 {
     return player_res_fire();
@@ -6727,6 +6772,11 @@ int player::res_cold() const
 int player::res_elec() const
 {
     return player_res_electricity();
+}
+
+bool player::res_mut(bool calc_unid) const
+{
+    return you.rmut_from_item(calc_unid) || _demigod_has_rune(RUNE_MNOLEG);
 }
 
 int player::res_water_drowning() const
@@ -6763,6 +6813,9 @@ int player::res_rotting(bool temp) const
     {
         return 3;
     }
+
+    if (_demigod_has_rune(RUNE_GLOORX_VLOQ))
+        return 3;
 
     const item_def* armour = slot_item(EQ_BODY_ARMOUR);
     const bool embraced = armour && is_unrandom_artefact(*armour, UNRAND_EMBRACE);
@@ -6849,6 +6902,9 @@ int player_res_magic(bool calc_unid, bool temp)
         return MAG_IMMUNE;
 
     int rm = you.experience_level * species_mr_modifier(you.species);
+
+    if (_demigod_has_rune(RUNE_LOM_LOBON))
+        rm += MR_PIP;
 
     // randarts
     rm += MR_PIP * you.scan_artefacts(ARTP_MAGIC_RESISTANCE, calc_unid);

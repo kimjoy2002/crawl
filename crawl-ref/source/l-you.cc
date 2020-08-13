@@ -258,7 +258,7 @@ LUARET1(you_res_drowning, boolean, you.res_water_drowning())
  * @treturn int resistance level
  * @function res_mutation
  */
-LUARET1(you_res_mutation, number, you.rmut_from_item(false) ? 1 : 0)
+LUARET1(you_res_mutation, number, you.res_mut(false) ? 1 : 0)
 /*** See invisible (sInv).
  * @treturn boolean
  * @function see_invisible
