@@ -1146,10 +1146,6 @@ wand of polymorph
 A magical device which causes a creature to be transmogrified into another
 form. It is especially effective against shape-changing creatures.
 %%%%
-wand of random effects
-
-A magical device which can produce a variety of effects.
-%%%%
 war axe
 
 A military axe with a long haft and a single-bladed head.

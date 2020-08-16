@@ -3115,17 +3115,6 @@ static const struct spell_desc spelldata[] =
 },
 
 {
-    SPELL_RANDOM_EFFECTS, "Random Effects",
-    spschool::conjuration,
-    spflag::dir_or_target | spflag::needs_tracer,
-    4,
-    200,
-    LOS_RADIUS, LOS_RADIUS,
-    4, 0,
-    TILEG_ERROR,
-},
-
-{
     SPELL_POISONOUS_VAPOURS, "Poisonous Vapours",
     spschool::poison | spschool::air,
     spflag::target | spflag::not_self,
@@ -3405,6 +3394,7 @@ AXED_SPELL(SPELL_SCATTERSHOT, "Scattershot")
 AXED_SPELL(SPELL_SUMMON_SWARM, "Summon swarm")
 AXED_SPELL(SPELL_CLOUD_CONE, "Cloud Cone")
 AXED_SPELL(SPELL_RING_OF_THUNDER, "Ring of Thunder")
+AXED_SPELL(SPELL_RANDOM_EFFECTS, "Random Effects")
 #endif
 
 };

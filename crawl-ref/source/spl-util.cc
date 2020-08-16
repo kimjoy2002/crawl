@@ -1675,6 +1675,7 @@ const set<spell_type> removed_spells =
     SPELL_DARKNESS,
     SPELL_CLOUD_CONE,
     SPELL_RING_OF_THUNDER,
+    SPELL_RANDOM_EFFECTS,
 #endif
 };
 

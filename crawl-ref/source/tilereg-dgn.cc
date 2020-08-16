@@ -418,10 +418,6 @@ static bool _is_appropriate_evokable(const item_def& item,
     if (!item_type_known(item))
         return true;
 
-    // Random effects are always (in)appropriate for all targets.
-    if (item.sub_type == WAND_RANDOM_EFFECTS)
-        return true;
-
     spell_type spell = spell_in_wand(static_cast<wand_type>(item.sub_type));
 
     return is_valid_spell(spell) && _is_appropriate_spell(spell, target);

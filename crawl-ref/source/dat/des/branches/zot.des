@@ -917,7 +917,7 @@ SUBST:  1 = 1 2:5 3:20
 SUBST:  2 = 2 2 .
 SUBST:  % = !:10 ?:4 .:20
 KITEM:  ! = club / nothing
-KITEM:  ? = wand of random effects
+KITEM:  ? = wand of polymorph
 COLOUR: " : yellow
 MAP
      ................
