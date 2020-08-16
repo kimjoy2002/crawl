@@ -3150,10 +3150,6 @@ wand of iceblast
 
 <wand>
 %%%%
-wand of paralysis
-
-<wand>
-%%%%
 wand of polymorph
 
 <wand>
